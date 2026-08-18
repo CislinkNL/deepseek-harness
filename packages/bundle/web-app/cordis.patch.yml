@@ -272,6 +272,10 @@
 
     - id: vision-http
       name: '@deepseek-ai/dsh-vision-http'
+      config:
+        # glm-4v-flash is retired on Z.ai (HTTP 400 unknown model); glm-5v-turbo
+        # is the current vision tier verified against the endpoint.
+        model: glm-5v-turbo
 
     # Converts image uploads to text for text-only routes (DeepSeek 识图);
     # needs the Z_AI_API_KEY credential to analyze, else uploads keep the
