@@ -14,7 +14,7 @@ import type { Context } from '@deepseek-ai/cordis'
 // method) instead of the standalone helper.
 import type { ISessions, SessionFace, SessionId } from '@deepseek-ai/dsh-client-runtime/client'
 import type { ImageAttachmentRef, ImageMediaType } from '@deepseek-ai/dsh-attachment'
-import type { ComposerAttachment } from './contract/slots.ts'
+import type { ComposerAttachment, ComposerFile } from './contract/slots.ts'
 import type { QueueAction, QueueItemId } from './contract/queue.ts'
 import type { ComposerBlocks } from './input/blocks.ts'
 import type { DraftAttachmentId, SessionInputResolver } from './input/contract.ts'
@@ -94,6 +94,7 @@ export class ConversationController extends Service implements IConversation {
   /** The per-session composer-block registry. */
   readonly blocks: ComposerBlocks
   private readonly draftAttachments = new Map<DraftAttachmentId, ComposerAttachment>()
+  private readonly draftFileDescriptors = new Map<DraftAttachmentId, ComposerFile>()
   private readonly imageUrls = new Map<string, ImageUrlEntry>()
   private readonly imageGenerations = new Map<SessionId, number>()
   private readonly createdImageUrls = new Set<string>()
@@ -143,17 +144,24 @@ export class ConversationController extends Service implements IConversation {
     session: SessionFace,
     text: string,
     imageIds: readonly DraftAttachmentId[],
+    fileIds: readonly DraftAttachmentId[],
     mode: InputSubmitMode,
   ): Promise<void> {
     const attachments = this.draftImages(imageIds)
     if (attachments.length !== imageIds.length) {
       throw new Error('conversation.sendSession: one or more draft images are no longer available')
     }
+    const files = this.draftFiles(fileIds)
+    if (files.length !== fileIds.length) {
+      throw new Error('conversation.sendSession: one or more draft files are no longer available')
+    }
     const uploaded = await this.serializeImages(attachments.map(attachment => attachment.file))
-    const content = [...uploaded, ...(text === '' ? [] : [{ type: 'text' as const, text }])]
+    const uploadedFiles = await this.serializeFiles(files.map(file => file.file))
+    const content = [...uploaded, ...uploadedFiles, ...(text === '' ? [] : [{ type: 'text' as const, text }])]
     const result = await session.prompt(content, mode)
     if (!result.ok) throw new Error(`conversation.send failed: ${result.error.code}: ${result.error.message}`)
     this.releaseDraftImages(attachments)
+    this.releaseDraftFiles(files)
   }
 
   /**
@@ -203,6 +211,49 @@ export class ConversationController extends Service implements IConversation {
    */
   releaseDraftImages(attachments: readonly ComposerAttachment[]): void {
     for (const attachment of attachments) this.releaseDraftImage(attachment.id)
+  }
+
+  /**
+   * Create runtime-only draft files (name and size only; bytes stay in the File).
+   * @param files - browser files to register.
+   * @returns ordered draft descriptors.
+   */
+  createDraftFiles(files: readonly File[]): readonly ComposerFile[] {
+    return files.map((file) => {
+      const draft: ComposerFile = {
+        kind: 'file',
+        id: crypto.randomUUID() as DraftAttachmentId,
+        file,
+        name: file.name === '' ? 'file' : file.name,
+        size: file.size,
+      }
+      this.draftFileDescriptors.set(draft.id, draft)
+      return draft
+    })
+  }
+
+  /**
+   * Resolve ordered input-state ids to runtime-owned draft files.
+   * @param ids - draft attachment ids.
+   * @returns descriptors that remain live, in requested order.
+   */
+  draftFiles(ids: readonly DraftAttachmentId[]): readonly ComposerFile[] {
+    const drafts: ComposerFile[] = []
+    for (const id of ids) {
+      const draft = this.draftFileDescriptors.get(id)
+      if (draft !== undefined) drafts.push(draft)
+    }
+    return drafts
+  }
+
+  /** Release one browser-owned draft file descriptor. */
+  releaseDraftFile(id: DraftAttachmentId): void {
+    this.draftFileDescriptors.delete(id)
+  }
+
+  /** Release a set of browser-owned draft file descriptors. */
+  releaseDraftFiles(files: readonly ComposerFile[]): void {
+    for (const file of files) this.releaseDraftFile(file.id)
   }
 
   /**
@@ -319,6 +370,16 @@ export class ConversationController extends Service implements IConversation {
       mediaType: imageMediaType(file.type),
       data: bytesToBase64(new Uint8Array(await file.arrayBuffer())),
       ...(file.name === '' ? {} : { name: file.name }),
+    })))
+  }
+
+  /** Convert browser files to file prompt parts (base64 bytes, name, size). */
+  private serializeFiles(files: readonly File[]): Promise<Parameters<SessionFace['prompt']>[0]> {
+    return Promise.all(files.map(async file => ({
+      type: 'file' as const,
+      name: file.name === '' ? 'file' : file.name,
+      data: bytesToBase64(new Uint8Array(await file.arrayBuffer())),
+      size: file.size,
     })))
   }
 }

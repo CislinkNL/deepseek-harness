@@ -23,6 +23,8 @@ export type {
   MessageId, ModelReasoningEffort, ModelSelection, QueueAction, QueuedInboxItem, SessionModels,
   SubagentsApi, SubagentAddress, SubagentCatalog, SubagentListEntry, SubagentPromptReceipt,
   JobView,
+  TeamTaskAiReport, TeamTaskCreateFields, TeamTaskId, TeamTaskPriority, TeamTaskStatus,
+  TeamTaskUpdateFields, TeamTasksApi, TeamTaskView,
   RpcRequest, RpcResponse, RpcResult, RpcError, RpcErrorCode,
   ClientRequest, ServerResponse, ServerRequest, ClientResponse, RpcMessage, RpcReceipt,
   HostDescription, IApiClient, SessionId, SessionEvent, ContentBlock, StreamChunk,

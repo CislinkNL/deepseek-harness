@@ -51,8 +51,11 @@ function mountBar(shell: SessionInputShell, over?: { running?: boolean; disabled
     inputActions: shell.actions,
     keyboard: shell,
     addImages: () => null,
+    addFiles: () => null,
+    removeFile: () => {},
     removeImage: () => {},
     draftImages: () => [],
+    draftFiles: () => [],
     resolveSubmitMode: () => 'queue',
     toggleCommandMenu: vi.fn(),
     useNotices: bindSnapshotSelector(shell.notices),
@@ -95,7 +98,7 @@ describe('matrix row: plain', () => {
     fireEvent.change(textarea, { target: { value: '普通消息' } })
     expect(shell.snapshot.claim).toBeUndefined()
     fireEvent.keyDown(textarea, { key: 'Enter' })
-    expect(sink).toHaveBeenCalledWith('普通消息', [], 'queue')
+    expect(sink).toHaveBeenCalledWith('普通消息', [], [], 'queue')
     expect(shell.snapshot.phase).toBe('plain')
   })
 })
@@ -194,7 +197,7 @@ describe('matrix row: locked (session disabled)', () => {
     expect((textarea).disabled).toBe(false)
     fireEvent.change(textarea, { target: { value: '排队' } })
     fireEvent.keyDown(textarea, { key: 'Enter' })
-    expect(sink).toHaveBeenCalledWith('排队', [], 'queue')
+    expect(sink).toHaveBeenCalledWith('排队', [], [], 'queue')
   })
 })
 

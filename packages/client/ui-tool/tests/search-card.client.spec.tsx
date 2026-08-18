@@ -400,9 +400,9 @@ describe('DetailsPanel Output section (search)', () => {
         useInput={(() => { throw new Error('unused') })}
         inputActions={{
           setDraft: () => {},
-          addImages: () => true,
-          removeImage: () => {},
-          pruneImages: () => {},
+          addImages: () => true, addFiles: () => true,
+          removeImage: () => {}, removeFile: () => {},
+          pruneImages: () => {}, pruneFiles: () => {},
           submit: () => {},
         }}
         useProjection={(() => undefined)}

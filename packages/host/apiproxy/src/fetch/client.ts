@@ -54,6 +54,10 @@ import {
   goalClearValueSchema,
 } from '../api/goals.schema.ts'
 import {
+  teamTaskCreateValueSchema, teamTaskListValueSchema, teamTaskProcessValueSchema,
+  teamTaskRemoveValueSchema, teamTaskUpdateValueSchema,
+} from '../api/team-tasks.schema.ts'
+import {
   settingsDescribeValueSchema, settingsMutateValueSchema, settingsOpenDocumentValueSchema,
   settingsReplaceValueSchema, settingsUpdateValueSchema,
 } from '../api/settings.schema.ts'
@@ -144,6 +148,13 @@ export interface IApiClient {
     complete(payload: RequestPayload<'goal.complete'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'goal.complete'>>>
     clear(payload: RequestPayload<'goal.clear'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'goal.clear'>>>
   }
+  teamTasks: {
+    list(payload: RequestPayload<'teamTask.list'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'teamTask.list'>>>
+    create(payload: RequestPayload<'teamTask.create'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'teamTask.create'>>>
+    update(payload: RequestPayload<'teamTask.update'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'teamTask.update'>>>
+    remove(payload: RequestPayload<'teamTask.remove'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'teamTask.remove'>>>
+    process(payload: RequestPayload<'teamTask.process'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'teamTask.process'>>>
+  }
   settings: {
     describe(payload: RequestPayload<'settings.describe'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'settings.describe'>>>
     openDocument(payload: RequestPayload<'settings.openDocument'>, signal?: AbortSignal): Promise<RpcResponse<ResponseValue<'settings.openDocument'>>>
@@ -211,6 +222,11 @@ const UNARY_VALUE_SCHEMAS: { [K in keyof RpcMethodMap]: z.ZodType<Wire<ResponseV
   'goal.resume': goalResumeValueSchema,
   'goal.complete': goalCompleteValueSchema,
   'goal.clear': goalClearValueSchema,
+  'teamTask.list': teamTaskListValueSchema,
+  'teamTask.create': teamTaskCreateValueSchema,
+  'teamTask.update': teamTaskUpdateValueSchema,
+  'teamTask.remove': teamTaskRemoveValueSchema,
+  'teamTask.process': teamTaskProcessValueSchema,
   'settings.describe': settingsDescribeValueSchema,
   'settings.openDocument': settingsOpenDocumentValueSchema,
   'settings.update': settingsUpdateValueSchema,
@@ -478,6 +494,14 @@ export abstract class AbstractApiClient implements IApiClient {
     resume: (payload, signal) => this.callUnary('goal.resume', payload, signal),
     complete: (payload, signal) => this.callUnary('goal.complete', payload, signal),
     clear: (payload, signal) => this.callUnary('goal.clear', payload, signal),
+  }
+
+  readonly teamTasks: IApiClient['teamTasks'] = {
+    list: (payload, signal) => this.callUnary('teamTask.list', payload, signal),
+    create: (payload, signal) => this.callUnary('teamTask.create', payload, signal),
+    update: (payload, signal) => this.callUnary('teamTask.update', payload, signal),
+    remove: (payload, signal) => this.callUnary('teamTask.remove', payload, signal),
+    process: (payload, signal) => this.callUnary('teamTask.process', payload, signal),
   }
 
   readonly settings: IApiClient['settings'] = {

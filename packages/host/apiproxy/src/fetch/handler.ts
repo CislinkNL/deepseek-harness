@@ -57,6 +57,10 @@ import {
   goalClearRequestSchema,
 } from '../api/goals.schema.ts'
 import {
+  teamTaskCreateRequestSchema, teamTaskListRequestSchema, teamTaskProcessRequestSchema,
+  teamTaskRemoveRequestSchema, teamTaskUpdateRequestSchema,
+} from '../api/team-tasks.schema.ts'
+import {
   settingsDescribeRequestSchema, settingsMutateRequestSchema, settingsOpenDocumentRequestSchema,
   settingsReplaceRequestSchema, settingsUpdateRequestSchema,
 } from '../api/settings.schema.ts'
@@ -129,6 +133,11 @@ const UNARY_ROUTES: UnaryRoutes = {
   'goal.resume': { schema: goalResumeRequestSchema, invoke: (api, r) => api.goals.resume(r) },
   'goal.complete': { schema: goalCompleteRequestSchema, invoke: (api, r) => api.goals.complete(r) },
   'goal.clear': { schema: goalClearRequestSchema, invoke: (api, r) => api.goals.clear(r) },
+  'teamTask.list': { schema: teamTaskListRequestSchema, invoke: (api, r) => api.teamTasks.list(r) },
+  'teamTask.create': { schema: teamTaskCreateRequestSchema, invoke: (api, r) => api.teamTasks.create(r) },
+  'teamTask.update': { schema: teamTaskUpdateRequestSchema, invoke: (api, r) => api.teamTasks.update(r) },
+  'teamTask.remove': { schema: teamTaskRemoveRequestSchema, invoke: (api, r) => api.teamTasks.remove(r) },
+  'teamTask.process': { schema: teamTaskProcessRequestSchema, invoke: (api, r) => api.teamTasks.process(r) },
   'settings.describe': { schema: settingsDescribeRequestSchema, invoke: (api, r) => api.settings.describe(r) },
   'settings.openDocument': { schema: settingsOpenDocumentRequestSchema, invoke: (api, r, signal) => api.settings.openDocument(r, signal) },
   'settings.update': { schema: settingsUpdateRequestSchema, invoke: (api, r) => api.settings.update(r) },

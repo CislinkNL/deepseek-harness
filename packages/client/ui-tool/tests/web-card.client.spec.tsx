@@ -230,9 +230,9 @@ describe('DetailsPanel web Output section', () => {
         useInput={(() => { throw new Error('unused') })}
         inputActions={{
           setDraft: () => {},
-          addImages: () => true,
-          removeImage: () => {},
-          pruneImages: () => {},
+          addImages: () => true, addFiles: () => true,
+          removeImage: () => {}, removeFile: () => {},
+          pruneImages: () => {}, pruneFiles: () => {},
           submit: () => {},
         }}
         useProjection={(() => undefined)}

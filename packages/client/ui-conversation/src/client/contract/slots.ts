@@ -30,6 +30,15 @@ export interface ComposerAttachment {
   previewUrl: string
 }
 
+/** Browser-runtime descriptor of one unsent file draft (no preview; bytes stay in the File). */
+export interface ComposerFile {
+  kind: 'file'
+  id: DraftAttachmentId
+  file: File
+  name: string
+  size: number
+}
+
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface SlotMap {
     /**
@@ -499,6 +508,12 @@ export interface ComposerBarInjected {
   removeImage: ((id: DraftAttachmentId) => void) | undefined
   /** Resolve ordered input ids to browser-owned draft images. */
   draftImages: ((ids: readonly DraftAttachmentId[]) => readonly ComposerAttachment[]) | undefined
+  /** Create descriptors and append file ids to the session input. */
+  addFiles: ((files: readonly File[]) => string | null) | undefined
+  /** Release one file descriptor and remove its id from session input. */
+  removeFile: ((id: DraftAttachmentId) => void) | undefined
+  /** Resolve ordered input ids to browser-owned draft files. */
+  draftFiles: ((ids: readonly DraftAttachmentId[]) => readonly ComposerFile[]) | undefined
   /** Resolve one keyboard submission gesture against the current running state and persisted preference. */
   resolveSubmitMode: (
     running: boolean,

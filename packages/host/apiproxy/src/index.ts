@@ -27,8 +27,16 @@ export { RpcId } from './api/rpc.ts'
 export { toFetchHandler } from './fetch/handler.ts'
 export { AbstractApiClient, InProcessApiClient } from './fetch/client.ts'
 export type { IApiClient } from './fetch/client.ts'
-export { createApiProxy } from './api-proxy.ts'
-export type { ApiProxyDefaults } from './api-proxy.ts'
+export {
+  createApiProxy,
+  DEFAULT_MAX_FILE_BYTES,
+  DEFAULT_MAX_FILES_PER_MESSAGE,
+} from './api-proxy.ts'
+import {
+  DEFAULT_MAX_FILE_BYTES,
+  DEFAULT_MAX_FILES_PER_MESSAGE,
+} from './api-proxy.ts'
+export type { ApiProxyDefaults, ImageAdmissionService } from './api-proxy.ts'
 
 declare module '@deepseek-ai/cordis' {
   interface Context {
@@ -59,6 +67,16 @@ export interface Config {
    * @default 1024
    */
   coldBlankProbeMaxBytes?: number
+  /**
+   * Maximum encoded bytes accepted for one file attachment.
+   * @default 10485760 (10 MiB)
+   */
+  maxFileBytes?: number
+  /**
+   * Maximum file attachments accepted in one message.
+   * @default 10
+   */
+  maxFilesPerMessage?: number
 }
 
 /**
@@ -77,6 +95,8 @@ export class ApiProxyService extends Service implements ApiProxy {
     sessionExportCompressionLevel: z.number().step(1).min(0).max(9)
       .default(DEFAULT_SESSION_LOG_COMPRESSION_LEVEL) as z<SessionLogCompressionLevel>,
     coldBlankProbeMaxBytes: z.natural().default(DEFAULT_COLD_BLANK_PROBE_MAX_BYTES),
+    maxFileBytes: z.number().step(1).min(1).default(DEFAULT_MAX_FILE_BYTES),
+    maxFilesPerMessage: z.number().step(1).min(1).default(DEFAULT_MAX_FILES_PER_MESSAGE),
   })
 
   readonly sessions: ApiProxy['sessions']
@@ -89,6 +109,7 @@ export class ApiProxyService extends Service implements ApiProxy {
   readonly settings: ApiProxy['settings']
   readonly credentials: ApiProxy['credentials']
   readonly llm: ApiProxy['llm']
+  readonly teamTasks: ApiProxy['teamTasks']
   readonly events: ApiProxy['events']
   readonly downloads: ApiProxy['downloads']
   readonly respond: ApiProxy['respond']
@@ -106,6 +127,8 @@ export class ApiProxyService extends Service implements ApiProxy {
       ...(config.coldBlankProbeMaxBytes === undefined
         ? {}
         : { coldBlankProbeMaxBytes: config.coldBlankProbeMaxBytes }),
+      ...config.maxFileBytes === undefined ? {} : { maxFileBytes: config.maxFileBytes },
+      ...config.maxFilesPerMessage === undefined ? {} : { maxFilesPerMessage: config.maxFilesPerMessage },
     })
     this.sessions = api.sessions
     this.subagents = api.subagents
@@ -117,6 +140,7 @@ export class ApiProxyService extends Service implements ApiProxy {
     this.settings = api.settings
     this.credentials = api.credentials
     this.llm = api.llm
+    this.teamTasks = api.teamTasks
     this.events = api.events
     this.downloads = api.downloads
     // createApiProxy returns closures (no `this` capture), so the bind is

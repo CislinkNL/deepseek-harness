@@ -7,10 +7,15 @@
 
 import { describe, expect, it, vi } from 'vitest'
 import type { SessionId } from '@deepseek-ai/dsh-session'
-import type { ApiProxy, GoalRef, HostFrame, MuxFrame, RpcMessage, RpcRequest, RpcResponse } from '@deepseek-ai/dsh-host-apiproxy'
+import type { ApiProxy, GoalRef, HostFrame, MuxFrame, RpcMessage, RpcRequest, RpcResponse, TeamTaskId, TeamTaskView } from '@deepseek-ai/dsh-host-apiproxy'
 import { InProcessApiClient, RpcId, toFetchHandler } from '@deepseek-ai/dsh-host-apiproxy'
 
 const sid = (id: string): SessionId => id as SessionId
+
+/** Minimal team-task wire value for stubs that never exercise the board. */
+function stubTask(): TeamTaskView {
+  return { id: 't' as TeamTaskId, title: 'stub', priority: 'medium', status: 'todo', createdAt: 0, updatedAt: 0 }
+}
 
 function ok<T>(request: RpcRequest<unknown>, value: T): Promise<RpcResponse<T>> {
   return Promise.resolve({ rpcId: request.rpcId, result: { ok: true, value } })
@@ -28,6 +33,7 @@ function scriptedApi(overrides: {
   settings?: Partial<ApiProxy['settings']>
   credentials?: Partial<ApiProxy['credentials']>
   llm?: Partial<ApiProxy['llm']>
+  teamTasks?: Partial<ApiProxy['teamTasks']>
   respond?: ApiProxy['respond']
 } = {}): ApiProxy {
   async function *empty<F>(): AsyncGenerator<RpcRequest<F>> { /* no frames */ }
@@ -127,6 +133,14 @@ function scriptedApi(overrides: {
       models: r => ok(r, { groups: [], failures: [] }),
       discoverModels: err,
       ...overrides.llm,
+    },
+    teamTasks: {
+      list: r => ok(r, { tasks: [] }),
+      create: r => ok(r, { task: stubTask() }),
+      update: r => ok(r, { task: stubTask() }),
+      remove: r => ok(r, { removed: true as const }),
+      process: r => ok(r, { task: stubTask() }),
+      ...overrides.teamTasks,
     },
     events: { mux: () => empty<MuxFrame>(), host: () => empty<HostFrame>(), ...overrides.events },
     respond: overrides.respond ?? (() => Promise.resolve({ accepted: false as const, reason: 'not-pending' as const })),
@@ -753,6 +767,13 @@ describe('config unary surface', () => {
         providers: record('llm.providers', r => ok(r, { providers: [providerRow] })),
         models: record('llm.models', r => ok(r, { groups: [group], failures: [] })),
         discoverModels: record('llm.discoverModels', r => ok(r, { models: [{ id: 'acme-large', contextWindow: 65536 }] })),
+      },
+      teamTasks: {
+        list: record('teamTask.list', r => ok(r, { tasks: [] })),
+        create: record('teamTask.create', r => ok(r, { task: stubTask() })),
+        update: record('teamTask.update', r => ok(r, { task: stubTask() })),
+        remove: record('teamTask.remove', r => ok(r, { removed: true as const })),
+        process: record('teamTask.process', r => ok(r, { task: stubTask() })),
       },
     })
     const c = client(api)

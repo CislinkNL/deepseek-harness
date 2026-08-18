@@ -285,24 +285,35 @@ describe('AppFrame', () => {
 })
 
 describe('AppFrame — narrow-viewport auto-collapse', () => {
-  it('mounts collapsed below the breakpoint with no sidebar handle', () => {
+  it('mounts below the breakpoint with the rail hidden and a floating open button', () => {
     frameWidth = 980
     const { frame, slotCalls } = mountFrame()
-    expect(tracks(frame)).toEqual([SIDEBAR_COLLAPSED, 0])
+    expect(tracks(frame)).toEqual([0, 0])
     expect(frame.hasAttribute('data-sidebar-collapsed')).toBe(true)
-    expect(slotCalls.filter(c => c.key === 'sidebar').at(-1)!.props).toEqual({ collapsed: true, width: SIDEBAR_COLLAPSED })
+    expect(slotCalls.filter(c => c.key === 'sidebar').at(-1)!.props).toEqual({ collapsed: true, width: 0 })
     expect(frame.querySelectorAll('[class*="handle"]')).toHaveLength(0)
+    expect(frame.querySelectorAll('button[class*="openButton"]')).toHaveLength(1)
   })
 
-  it('narrow toggle re-expands over the squeezed center and back', () => {
+  it('narrow toggle re-expands as an overlay drawer over the hidden rail and back', () => {
     frameWidth = 980
-    const { frame, instance } = mountFrame()
+    const { frame, instance, slotCalls } = mountFrame()
     act(() => { instance.actions.toggleSidebar() })
-    expect(tracks(frame)).toEqual([280, 0])
-    expect(frame.hasAttribute('data-sidebar-collapsed')).toBe(false)
-    expect(frame.querySelectorAll('[class*="handle"]')).toHaveLength(1)
+    // The in-flow track stays zero (rail hidden); the expanded pane floats
+    // over the center instead of squeezing it to the final fallback.
+    expect(tracks(frame)).toEqual([0, 0])
+    const pane = frame.querySelector<HTMLElement>('[class*="sidebarCol"]')!
+    expect(pane.hasAttribute('data-drawer')).toBe(true)
+    expect(pane.style.width).toBe('280px')
+    expect(slotCalls.filter(c => c.key === 'sidebar').at(-1)!.props).toEqual({ collapsed: false, width: 280 })
+    expect(frame.querySelectorAll('[class*="handle"]')).toHaveLength(0)
+    expect(frame.querySelectorAll('button[class*="drawerBackdrop"]')).toHaveLength(1)
+    expect(frame.querySelectorAll('button[class*="openButton"]')).toHaveLength(0)
     act(() => { instance.actions.toggleSidebar() })
-    expect(tracks(frame)).toEqual([SIDEBAR_COLLAPSED, 0])
+    expect(tracks(frame)).toEqual([0, 0])
+    expect(frame.querySelector('[class*="sidebarCol"]')!.hasAttribute('data-drawer')).toBe(false)
+    expect(frame.querySelectorAll('button[class*="drawerBackdrop"]')).toHaveLength(0)
+    expect(frame.querySelectorAll('button[class*="openButton"]')).toHaveLength(1)
   })
 
   it('a wide-closed preference re-expands at the contract default while narrow', () => {
@@ -312,7 +323,10 @@ describe('AppFrame — narrow-viewport auto-collapse', () => {
     frameWidth = 980
     act(() => { fireResize?.(); vi.advanceTimersByTime(20) })
     act(() => { instance.actions.toggleSidebar() })
-    expect(tracks(frame)).toEqual([280, 0])
+    expect(tracks(frame)).toEqual([0, 0])
+    const pane = frame.querySelector<HTMLElement>('[class*="sidebarCol"]')!
+    expect(pane.hasAttribute('data-drawer')).toBe(true)
+    expect(pane.style.width).toBe('280px')
     expect(instance.getSnapshot().sidebar).toBe(0) // preference untouched
   })
 
@@ -321,7 +335,7 @@ describe('AppFrame — narrow-viewport auto-collapse', () => {
     act(() => { instance.actions.setSidebar(400) })
     frameWidth = 980
     act(() => { fireResize?.(); vi.advanceTimersByTime(20) })
-    expect(tracks(frame)).toEqual([SIDEBAR_COLLAPSED, 0])
+    expect(tracks(frame)).toEqual([0, 0])
     frameWidth = 1920
     act(() => { fireResize?.(); vi.advanceTimersByTime(20) })
     expect(tracks(frame)).toEqual([400, 0])

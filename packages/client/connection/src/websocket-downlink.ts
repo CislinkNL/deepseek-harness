@@ -104,8 +104,15 @@ export class WebSocketDownlinks {
   ): void {
     this.server.handleUpgrade(req, socket, head, (websocket) => {
       const abort = new AbortController()
-      websocket.once('close', () => { abort.abort() })
-      websocket.once('error', () => { abort.abort() })
+      // A proxied deployment (Cloudflare Tunnel) reaps an idle WebSocket
+      // without a close frame, leaving the client stale until a manual
+      // refresh. A protocol ping every 25s keeps the tunnel segment alive;
+      // browsers answer pongs in the background without page activity.
+      const heartbeat = setInterval(() => {
+        if (websocket.readyState === WebSocket.OPEN) websocket.ping()
+      }, 25_000)
+      websocket.once('close', () => { clearInterval(heartbeat); abort.abort() })
+      websocket.once('error', () => { clearInterval(heartbeat); abort.abort() })
       websocket.once('message', () => {
         websocket.close(1008, 'downlink only')
       })

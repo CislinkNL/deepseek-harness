@@ -29,6 +29,73 @@
   border-right: 1px solid var(--dsw-alias-border-l1);
 }
 
+/* Narrow re-expand: the pane floats as a drawer over the center instead of
+   squeezing it to the concession chain's final fallback. Fixed positioning
+   escapes .frame's overflow clip; no ancestor here creates a containing
+   block (transition is on grid-template-columns, not transform). */
+.sidebarCol[data-drawer] {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
+}
+
+/* Narrow-closed: the rail subtree stays mounted at a zero track; its border
+   must not paint a 1px seam at the viewport edge. */
+.sidebarCol[data-rail-hidden] {
+  border-right: none;
+}
+
+/* Narrow-closed open affordance: a floating hamburger above the conversation,
+   below the backdrop (9), drawer (10), and shell overlays (20). */
+.openButton {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 5;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid var(--dsw-alias-border-l1);
+  background: var(--dsw-alias-button-floating-fill);
+  cursor: pointer;
+}
+
+.openButton:hover {
+  background: var(--dsw-alias-button-floating-hover);
+}
+
+/* Hamburger mark: one bar plus two box-shadow copies, in the label ink. */
+.openButton::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  right: 11px;
+  top: 13px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--dsw-alias-label-primary);
+  box-shadow:
+    0 6px 0 var(--dsw-alias-label-primary),
+    0 12px 0 var(--dsw-alias-label-primary);
+}
+
+/* Dismiss surface behind the drawer; sits above content, below the drawer
+   and below .overlayLayer (z-index 20) so modals still stack over it. */
+.drawerBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9;
+  display: block;
+  border: none;
+  padding: 0;
+  background: rgb(0 0 0 / 25%);
+  cursor: pointer;
+}
+
 .centerCol {
   min-width: 0;
   display: flex;

@@ -4,8 +4,8 @@
  */
 
 import { randomUUID } from 'node:crypto'
-import { mkdir, stat } from 'node:fs/promises'
-import { dirname } from 'node:path'
+import { mkdir, stat, writeFile } from 'node:fs/promises'
+import { dirname, join } from 'node:path'
 import type { Context } from '@deepseek-ai/cordis'
 import { installModelSelection } from '@deepseek-ai/dsh-agent'
 import type { Agent, ModelSelection, ModelSelectionRef, AgentOptions, AgentStatus } from '@deepseek-ai/dsh-agent'
@@ -66,6 +66,9 @@ import type { JobSnapshot } from '@deepseek-ai/dsh-jobs'
 import type {} from '@deepseek-ai/dsh-session-projection-cache'
 // GoalError narrows domain rejections to their stable codes at the wire boundary.
 import { GoalError } from '@deepseek-ai/dsh-goal'
+import { TeamTaskError } from '@deepseek-ai/dsh-team-tasks'
+// Type-only: resolves `ctx.get('teamTaskProcessor')` to the processor service.
+import type {} from '@deepseek-ai/dsh-team-tasks-ai'
 import type { GoalRef as CoreGoalRef } from '@deepseek-ai/dsh-goal'
 // Type-only edges: resolve the command-change stream and `ctx.get('skills')`.
 import type {} from '@deepseek-ai/dsh-commands'
@@ -110,6 +113,26 @@ import {
 } from '@deepseek-ai/dsh-api-remotes'
 import { canOpenNativePath, openNativePath, openNativeTextFile } from './native-path-opener.ts'
 
+/** The image-admission extension point: rewrites image-bearing prompt parts for a text-only route. */
+export interface ImageAdmissionService {
+  /**
+   * Convert image parts to text (for example through the vision seam) or leave
+   * them unchanged. Content that still carries an image keeps the host's
+   * `MODEL_DOES_NOT_SUPPORT_IMAGES` refusal.
+   * @param parts - the submitted prompt content parts (image data is base64).
+   * @param model - the text-only model id that rejected image input.
+   * @returns the content to admit.
+   */
+  rewriteImageParts(parts: readonly PromptContentPart[], model: string): Promise<readonly PromptContentPart[]>
+}
+
+declare module '@deepseek-ai/cordis' {
+  interface Context {
+    /** Optional image-admission rewriter read via `ctx.get`; absent keeps the text-only refusal. */
+    imageAdmission: ImageAdmissionService
+  }
+}
+
 /** Page size when history is called without maxMessages. */
 const DEFAULT_MAX_MESSAGES = 50
 
@@ -134,6 +157,10 @@ const SESSION_SEARCH_PROVIDER_CALL_LIMIT = 100
 const COLD_SUMMARY_BATCH_SIZE = 16
 /** Default maximum artifact size eligible for one cold blankness read. */
 export const DEFAULT_COLD_BLANK_PROBE_MAX_BYTES = 1024
+/** Default maximum encoded bytes accepted for one file attachment. */
+export const DEFAULT_MAX_FILE_BYTES = 10 * 1024 * 1024
+/** Default maximum file attachments accepted in one message. */
+export const DEFAULT_MAX_FILES_PER_MESSAGE = 10
 
 /** Conversation message event types (the pagination counting unit). */
 const MESSAGE_TYPES = new Set(['user/message', 'assistant/message'])
@@ -147,6 +174,67 @@ function decodeBase64(data: string): Uint8Array {
   return new Uint8Array(decoded)
 }
 
+/** Decode a file payload while rejecting non-canonical base64 forms. */
+function decodeFileBase64(data: string): Uint8Array {
+  const decoded = Buffer.from(data, 'base64')
+  if (data.length === 0 || decoded.toString('base64') !== data) {
+    throw new AttachmentError('File upload is not canonical base64.', 'INVALID_FILE_BASE64')
+  }
+  return new Uint8Array(decoded)
+}
+
+/** Reduce a browser file name to one safe workspace leaf. */
+function safeFileName(value: string): string {
+  const leaf = value.slice(Math.max(value.lastIndexOf('/'), value.lastIndexOf('\\')) + 1)
+  const clean = leaf.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 120)
+  if (clean === '' || clean === '.' || clean === '..') {
+    throw new AttachmentError('File name is invalid.', 'INVALID_FILE_NAME')
+  }
+  return clean
+}
+
+/**
+ * Materialize file parts to workspace paths: each file is written under the
+ * session cwd's `.dsh-uploads/` (readable by the sandboxed fs tools) and
+ * replaced by a path text part. Files always route through model tools, so
+ * this runs for every model route.
+ * @param agent - the admitting session's agent (supplies the workspace cwd).
+ * @param defaults - gateway defaults carrying the file limits.
+ * @param content - the submitted prompt content parts.
+ * @returns the content with file parts replaced by path text.
+ */
+async function materializeFileParts(
+  agent: Agent,
+  defaults: ApiProxyDefaults,
+  content: readonly PromptContentPart[],
+): Promise<PromptContentPart[]> {
+  if (!content.some(part => part.type === 'file')) return [...content]
+  const maxFileBytes = defaults.maxFileBytes ?? DEFAULT_MAX_FILE_BYTES
+  const maxFilesPerMessage = defaults.maxFilesPerMessage ?? DEFAULT_MAX_FILES_PER_MESSAGE
+  if (content.filter(part => part.type === 'file').length > maxFilesPerMessage) {
+    throw new AttachmentError('Prompt exceeds the configured file-count limit.', 'TOO_MANY_FILES')
+  }
+  const cwd = agent.session.header.cwd ?? defaults.cwd
+  const out: PromptContentPart[] = []
+  for (const part of content) {
+    if (part.type !== 'file') {
+      out.push(part)
+      continue
+    }
+    const bytes = decodeFileBase64(part.data)
+    if (bytes.byteLength > maxFileBytes) {
+      throw new AttachmentError('File exceeds the configured byte limit.', 'FILE_TOO_LARGE')
+    }
+    const name = safeFileName(part.name)
+    const target = join(cwd, '.dsh-uploads', `${Date.now()}-${randomUUID().slice(0, 8)}-${name}`)
+    await mkdir(dirname(target), { recursive: true })
+    await writeFile(target, bytes)
+    // The sanitized leaf rides the text; the raw browser name never reaches the model.
+    out.push({ type: 'text', text: `📎 附件「${name}」(文件)已保存到 ${target}，请用文件读取工具打开分析。` })
+  }
+  return out
+}
+
 /** Validate one prompt as a batch before publishing any durable image object. */
 async function durablePromptContent(ctx: Context, content: readonly PromptContentPart[]): Promise<ContentBlock[]> {
   if (content.every(part => part.type === 'text')) {
@@ -156,10 +244,17 @@ async function durablePromptContent(ctx: Context, content: readonly PromptConten
   if (content.filter(part => part.type === 'image').length > limits.maxImagesPerMessage) {
     throw new AttachmentError('Prompt exceeds the configured image-count limit.', 'TOO_MANY_IMAGES')
   }
-  const prepared = content.map(part => part.type === 'text'
-    ? part
-    : { part, data: decodeBase64(part.data) })
-  const images = prepared.filter((part): part is Extract<typeof part, { data: Uint8Array }> => 'data' in part)
+  const prepared: Array<
+    | { kind: 'text'; text: string }
+    | { kind: 'image'; part: Extract<PromptContentPart, { type: 'image' }>; data: Uint8Array }
+  > = content.map((part) => {
+    if (part.type === 'text') return { kind: 'text' as const, text: part.text }
+    if (part.type === 'image') return { kind: 'image' as const, part, data: decodeBase64(part.data) }
+    // File parts were materialized to workspace path text before durable
+    // content is built, so this arm is unreachable; it names the invariant.
+    throw new AttachmentError('File parts must be materialized before durable content.', 'UNEXPECTED_FILE_PART')
+  })
+  const images = prepared.filter((item): item is Extract<typeof prepared[number], { kind: 'image' }> => item.kind === 'image')
   const totalBytes = images.reduce((sum, image) => sum + image.data.byteLength, 0)
   if (totalBytes > limits.maxMessageImageBytes) {
     throw new AttachmentError('Prompt exceeds the configured aggregate image-byte limit.', 'IMAGES_TOO_LARGE')
@@ -173,7 +268,7 @@ async function durablePromptContent(ctx: Context, content: readonly PromptConten
   }
   const blocks: ContentBlock[] = []
   for (const item of prepared) {
-    if (!('data' in item)) {
+    if (item.kind === 'text') {
       blocks.push({ type: 'text', text: item.text })
       continue
     }
@@ -659,6 +754,10 @@ export interface ApiProxyDefaults {
   sessionExportCompressionLevel?: SessionLogCompressionLevel
   /** Maximum artifact size eligible for one cold blankness read. */
   coldBlankProbeMaxBytes?: number
+  /** Maximum encoded bytes accepted for one file attachment; defaults to 10 MiB. */
+  maxFileBytes?: number
+  /** Maximum file attachments accepted in one message; defaults to 10. */
+  maxFilesPerMessage?: number
   /**
    * Whether handing a path to the native opener can work at all — the
    * `hasDocument` capability the preset roster reports, and the switch
@@ -1825,6 +1924,31 @@ export function createApiProxy(ctx: Context, defaults: ApiProxyDefaults): ApiPro
     }
   }
 
+  /** Report the deployment gap when no team-tasks service is composed. */
+  function teamTaskUnavailable(request: RpcRequest<unknown>): RpcResponse<never> {
+    return err(request, {
+      code: 'team-task-error',
+      message: 'the team task board is unavailable: this deployment composes no team-tasks service',
+      details: { reason: 'UNAVAILABLE' },
+    })
+  }
+
+  /** Map one team-task rejection to the wire error; stable TeamTaskError codes ride in details. */
+  function teamTaskFailure(request: RpcRequest<unknown>, error: unknown): RpcResponse<never> {
+    if (error instanceof TeamTaskError) {
+      return err(request, {
+        code: 'team-task-error',
+        message: error.message,
+        details: { reason: error.code },
+      })
+    }
+    return err(request, {
+      code: 'internal',
+      message: `team task operation failed: ${String(error)}`,
+      details: {},
+    })
+  }
+
   /**
    * Whether an adapter currently serves this provider, and therefore whether
    * a session selecting it can start a turn. Catalog membership cannot answer
@@ -2482,18 +2606,42 @@ export function createApiProxy(ctx: Context, defaults: ApiProxyDefaults): ApiPro
         const hasImage = content.some(part => part.type === 'image')
         const admit = async (): Promise<RpcResponse<{ accepted: true }>> => {
           try {
+            // Files always materialize to workspace paths first (model routes
+            // read them through tools), then image admission runs over the rest.
+            let submitted: readonly PromptContentPart[] = await materializeFileParts(agent, defaults, content)
             if (hasImage) {
               const current = selectionFor(agent).current
               const modelInfo = await ctx.llm.resolveModelInfo(current.provider, current.model)
               if (modelInfo.inputModalities !== undefined && !modelInfo.inputModalities.includes('image')) {
-                return err(request, {
-                  code: 'attachment-error',
-                  message: `Model "${current.model}" does not support image input.`,
-                  details: { reason: 'MODEL_DOES_NOT_SUPPORT_IMAGES' },
-                })
+                // Extension point: an optional service may convert images to
+                // text (for example through the vision seam); content that
+                // still carries an image keeps the text-only refusal.
+                const admission = ctx.get('imageAdmission')
+                if (admission !== undefined) {
+                  try {
+                    submitted = await admission.rewriteImageParts(submitted, current.model)
+                  } catch (error: unknown) {
+                    if (error instanceof AttachmentError) throw error
+                    // A failing conversion (e.g. a missing vision credential)
+                    // is an attachment failure the composer can announce, not
+                    // an agent fault.
+                    throw new AttachmentError(
+                      `image conversion failed: ${error instanceof Error ? error.message : String(error)}`,
+                      'IMAGE_ADMISSION_FAILED',
+                      { cause: error },
+                    )
+                  }
+                }
+                if (submitted.some(part => part.type === 'image')) {
+                  return err(request, {
+                    code: 'attachment-error',
+                    message: `Model "${current.model}" does not support image input.`,
+                    details: { reason: 'MODEL_DOES_NOT_SUPPORT_IMAGES' },
+                  })
+                }
               }
             }
-            const durable = await durablePromptContent(ctx, content)
+            const durable = await durablePromptContent(ctx, submitted)
             const message: UserMessage = createUserMessage({ content: durable, source })
             if (mode === 'steer') agent.steer(message)
             else agent.followup(message)
@@ -3422,6 +3570,65 @@ export function createApiProxy(ctx: Context, defaults: ApiProxyDefaults): ApiPro
             message: error instanceof Error ? error.message : String(error),
             details: { settingsNs, ...baseURL === undefined ? {} : { baseURL } },
           })
+        }
+      },
+    },
+
+    teamTasks: {
+      // Session-independent shared board: the composed `teamTasks` service
+      // answers directly; an absent service reports the deployment gap.
+      async list(request) {
+        const teamTasks = ctx.get('teamTasks')
+        if (teamTasks === undefined) return teamTaskUnavailable(request)
+        try {
+          const tasks = await teamTasks.list()
+          return ok(request, { tasks: [...tasks] })
+        } catch (error: unknown) {
+          return teamTaskFailure(request, error)
+        }
+      },
+
+      async create(request) {
+        const teamTasks = ctx.get('teamTasks')
+        if (teamTasks === undefined) return teamTaskUnavailable(request)
+        try {
+          const task = await teamTasks.create(request.payload)
+          return ok(request, { task })
+        } catch (error: unknown) {
+          return teamTaskFailure(request, error)
+        }
+      },
+
+      async update(request) {
+        const teamTasks = ctx.get('teamTasks')
+        if (teamTasks === undefined) return teamTaskUnavailable(request)
+        try {
+          const task = await teamTasks.update(request.payload.id, request.payload.patch)
+          return ok(request, { task })
+        } catch (error: unknown) {
+          return teamTaskFailure(request, error)
+        }
+      },
+
+      async remove(request) {
+        const teamTasks = ctx.get('teamTasks')
+        if (teamTasks === undefined) return teamTaskUnavailable(request)
+        try {
+          await teamTasks.remove(request.payload.id)
+          return ok(request, { removed: true as const })
+        } catch (error: unknown) {
+          return teamTaskFailure(request, error)
+        }
+      },
+
+      async process(request) {
+        const processor = ctx.get('teamTaskProcessor')
+        if (processor === undefined) return teamTaskUnavailable(request)
+        try {
+          const task = await processor.process(request.payload.id)
+          return ok(request, { task })
+        } catch (error: unknown) {
+          return teamTaskFailure(request, error)
         }
       },
     },

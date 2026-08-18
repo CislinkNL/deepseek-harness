@@ -106,6 +106,17 @@
     - id: attachment-local
       name: '@deepseek-ai/dsh-attachment-local'
 
+    # Shared team task board: one JSON document under $DSH_HOME, shared across
+    # sessions and users. Override `path` (or `dshHome`) in a later patch layer
+    # to relocate the board.
+    - id: team-tasks-json
+      name: '@deepseek-ai/dsh-team-tasks-json'
+
+    # AI auto-processing: one dispatched agent turn per task (analysis +
+    # fix attempt + report); the board's 🤖 button drives it over RPC.
+    - id: team-tasks-ai
+      name: '@deepseek-ai/dsh-team-tasks-ai'
+
     # Full-text session search is opt-in. `openAt: never` keeps
     # ctx.sessionQuery mounted — exact reads, titles, and lineage traces
     # (session export, subagent-fork Workspace inheritance) stay available —

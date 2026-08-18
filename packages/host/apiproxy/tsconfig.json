@@ -33,6 +33,12 @@
       "path": "../../attachment/attachment"
     },
     {
+      "path": "../../team-tasks/team-tasks"
+    },
+    {
+      "path": "../../team-tasks/team-tasks-ai"
+    },
+    {
       "path": "../../llm/llm"
     },
     {

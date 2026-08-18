@@ -2414,6 +2414,10 @@ function createFixtureWorld(options: FixtureOptions): FixtureWorld {
         const userText = content.map(b => (b.type === 'text' ? b.text : '')).join('')
         const durable: ContentBlock[] = content.map((block) => {
           if (block.type === 'text') return block
+          if (block.type === 'file') {
+            // Demo admission mirrors the host: a file becomes a workspace path hint.
+            return { type: 'text', text: `📎 附件「${block.name}」(文件)已保存到 fixture 工作区，请用文件读取工具打开分析。` }
+          }
           const attachment: ImageAttachmentRef = {
             attachmentId: `fixture:${randomUuid()}` as AttachmentIdType,
             mediaType: block.mediaType,
@@ -2962,6 +2966,26 @@ function createFixtureWorld(options: FixtureOptions): FixtureWorld {
         models: fixtureModelGroups().flatMap(group => group.models.map(model => ({ id: model.id, name: model.name }))),
       }),
     },
+    teamTasks: {
+      // Demo board data: two lanes so a surface reading this fixture meets the
+      // tagged shape rather than an empty board.
+      list: request => ok(request, {
+        tasks: [
+          { id: 'fixture-task-1' as never, title: 'Fixture task 1', priority: 'high', status: 'todo', createdAt: 1, updatedAt: 1 },
+          { id: 'fixture-task-2' as never, title: 'Fixture task 2', priority: 'medium', status: 'doing', createdAt: 2, updatedAt: 2 },
+        ],
+      }),
+      create: request => ok(request, {
+        task: { id: 'fixture-task-new' as never, title: request.payload.title, priority: request.payload.priority ?? 'medium', status: 'todo', createdAt: 3, updatedAt: 3 },
+      }),
+      update: request => ok(request, {
+        task: { id: request.payload.id, title: 'patched', priority: 'medium', status: request.payload.patch.status ?? 'todo', createdAt: 4, updatedAt: 4 },
+      }),
+      remove: request => ok(request, { removed: true as const }),
+      process: request => ok(request, {
+        task: { id: request.payload.id, title: 'patched', priority: 'medium', status: 'done', aiReport: { text: 'fixture report', at: 5 }, createdAt: 4, updatedAt: 5 },
+      }),
+    },
     respond(message: ClientResponse): Promise<RpcReceipt> {
       // Same routing discipline as the host: rpcId first, then the payload's
       // audit correlation; a settled or unknown id is not-pending.
@@ -3129,6 +3153,11 @@ export class FixtureApiClient extends AbstractApiClient {
       case 'llm.providers': return this.api.llm.providers(request)
       case 'llm.models': return this.api.llm.models(request)
       case 'llm.discoverModels': return this.api.llm.discoverModels(request, signal)
+      case 'teamTask.list': return this.api.teamTasks.list(request)
+      case 'teamTask.create': return this.api.teamTasks.create(request)
+      case 'teamTask.update': return this.api.teamTasks.update(request)
+      case 'teamTask.remove': return this.api.teamTasks.remove(request)
+      case 'teamTask.process': return this.api.teamTasks.process(request)
     }
   }
 

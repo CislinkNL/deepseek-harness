@@ -1,9 +1,14 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { ApiProxy, HostFrame, MuxFrame } from '../src/api/index.ts'
+import type { ApiProxy, HostFrame, MuxFrame, TeamTaskId, TeamTaskView } from '../src/api/index.ts'
 import type { ClientResponse, RpcMessage, RpcReceipt, RpcRequest } from '../src/api/rpc.ts'
 import { RpcId } from '../src/api/rpc.ts'
 import { toFetchHandler } from '../src/fetch/handler.ts'
 import { AbstractApiClient, InProcessApiClient } from '../src/fetch/client.ts'
+
+/** Minimal team-task wire value for stubs that never exercise the board. */
+function stubTask(): TeamTaskView {
+  return { id: 't' as TeamTaskId, title: 'stub', priority: 'medium', status: 'todo', createdAt: 0, updatedAt: 0 }
+}
 
 /** Minimal in-memory ApiProxy: echoes rpcIds, scripts one frame per stream. */
 function fakeApi(overrides: Partial<{ muxFrames: MuxFrame[]; hostFrames: HostFrame[]; crashOn: string }> = {}): ApiProxy {
@@ -280,6 +285,23 @@ function fakeApi(overrides: Partial<{ muxFrames: MuxFrame[]; hostFrames: HostFra
       },
       async discoverModels(request) {
         return { rpcId: request.rpcId, result: { ok: true, value: { models: [] } } }
+      },
+    },
+    teamTasks: {
+      async list(request) {
+        return { rpcId: request.rpcId, result: { ok: true, value: { tasks: [] } } }
+      },
+      async create(request) {
+        return { rpcId: request.rpcId, result: { ok: true, value: { task: stubTask() } } }
+      },
+      async update(request) {
+        return { rpcId: request.rpcId, result: { ok: true, value: { task: stubTask() } } }
+      },
+      async remove(request) {
+        return { rpcId: request.rpcId, result: { ok: true, value: { removed: true as const } } }
+      },
+      async process(request) {
+        return { rpcId: request.rpcId, result: { ok: true, value: { task: stubTask() } } }
       },
     },
     events: {

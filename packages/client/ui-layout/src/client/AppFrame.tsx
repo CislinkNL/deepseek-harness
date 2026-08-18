@@ -13,7 +13,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { PropsRenderSlots, PropsRuntime, PropsStore } from '@deepseek-ai/dsh-client-ui-slots'
-import { computeColumns, SIDEBAR_AUTO_COLLAPSE, SIDEBAR_DEFAULT } from './columns.ts'
+import { computeColumns, clampWidth, SIDEBAR_AUTO_COLLAPSE, SIDEBAR_DEFAULT, SIDEBAR_MAX, SIDEBAR_MIN } from './columns.ts'
 import type { createLayoutStore } from './stores.ts'
 import css from './AppFrame.module.css'
 
@@ -139,7 +139,29 @@ export function AppFrame({
   const sidebarPreference = sidebarCollapsed
     ? 0
     : panels.sidebar === 0 ? SIDEBAR_DEFAULT : panels.sidebar
-  const cols = computeColumns(viewport, sidebarPreference, detailsSession === undefined ? 0 : panels.details)
+  // Narrow re-expand renders as an overlay drawer: the in-flow track keeps the
+  // collapsed rail and the expanded pane floats over the center — a squeezed
+  // center at the solver's final fallback is unreadable on a phone viewport.
+  // Narrow also hides the rail itself (track zero): a floating open button
+  // replaces the rail's toggle, so the conversation takes the full viewport.
+  const drawerOpen = narrow && !sidebarCollapsed
+  const drawerWidth = Math.min(
+    clampWidth(sidebarPreference || SIDEBAR_DEFAULT, SIDEBAR_MIN, SIDEBAR_MAX),
+    Math.max(viewport, SIDEBAR_MIN),
+  )
+  const cols = computeColumns(viewport, drawerOpen ? 0 : sidebarPreference, detailsSession === undefined ? 0 : panels.details)
+  const sidebarTrack = narrow ? 0 : cols.sidebar
+
+  // Selecting a session from the drawer is the navigation act — close the
+  // drawer so the chosen conversation takes the full viewport.
+  const currentSession = useSessions(s => s.current)
+  const lastCurrentSession = useRef(currentSession)
+  useEffect(() => {
+    if (drawerOpen && currentSession !== undefined && currentSession !== lastCurrentSession.current) {
+      actions.toggleSidebar()
+    }
+    lastCurrentSession.current = currentSession
+  }, [actions, currentSession, drawerOpen])
   const colsRef = useRef(cols)
   colsRef.current = cols
 
@@ -165,20 +187,43 @@ export function AppFrame({
     <div
       ref={frameRef}
       className={css.frame}
-      style={{ gridTemplateColumns: `${cols.sidebar}px minmax(0, 1fr) ${cols.details}px` }}
+      style={{ gridTemplateColumns: `${sidebarTrack}px minmax(0, 1fr) ${cols.details}px` }}
       data-sidebar-collapsed={sidebarCollapsed || undefined}
       data-details-collapsed={cols.details === 0 || undefined}
       data-dragging={dragging || undefined}
     >
-      <div className={css.sidebarCol}>
+      {narrow && !drawerOpen && (
+        <button
+          type="button"
+          aria-label="Open sidebar"
+          className={css.openButton}
+          onClick={() => actions.toggleSidebar()}
+        />
+      )}
+      {drawerOpen && (
+        <button
+          type="button"
+          aria-label="Collapse sidebar"
+          className={css.drawerBackdrop}
+          onClick={() => actions.toggleSidebar()}
+        />
+      )}
+      <div
+        className={css.sidebarCol}
+        data-drawer={drawerOpen || undefined}
+        data-rail-hidden={narrow && !drawerOpen || undefined}
+        style={drawerOpen ? { width: drawerWidth } : undefined}
+      >
         {/* Render-site slot call with live concession output: a closed
             sidebar keeps the mounted slot at the compact-rail width, and the
             component sees its rendered state as owner params decided here
             (collapsed follows the resolved rail, so a derived auto-collapse
-            renders the rail UI too). */}
+            renders the rail UI too). Drawer mode renders the expanded pane
+            at the drawer width while the in-flow track keeps the rail; a
+            narrow closed sidebar keeps the rail subtree mounted at zero. */}
         {renderSlot('sidebar', {
-          collapsed: sidebarCollapsed,
-          width: cols.sidebar,
+          collapsed: drawerOpen ? false : sidebarCollapsed,
+          width: drawerOpen ? drawerWidth : sidebarTrack,
         })}
       </div>
       <>
@@ -193,8 +238,9 @@ export function AppFrame({
       <div className={css.overlayLayer} data-shell-overlay>
         {renderSlot('shell.overlay', {})}
       </div>
-      {/* The collapsed rail is fixed-width: no resize handle while closed. */}
-      {!sidebarCollapsed && <DragHandle side="sidebar" left={cols.sidebar} onStart={onSidebarStart} onDrag={onSidebarDrag} onEnd={onDragEnd} />}
+      {/* The collapsed rail is fixed-width: no resize handle while closed; the
+          drawer is dismiss-only (drag-resizing an overlay has no grid track). */}
+      {!sidebarCollapsed && !drawerOpen && <DragHandle side="sidebar" left={cols.sidebar} onStart={onSidebarStart} onDrag={onSidebarDrag} onEnd={onDragEnd} />}
       {cols.details > 0 && <DragHandle side="details" left={viewport - cols.details} onStart={onDetailsStart} onDrag={onDetailsDrag} onEnd={onDragEnd} />}
     </div>
   )

@@ -270,6 +270,18 @@
     - id: ui-user-questions
       name: '@deepseek-ai/dsh-client-ui-user-questions'
 
+    - id: vision-http
+      name: '@deepseek-ai/dsh-vision-http'
+
+    # Converts image uploads to text for text-only routes (DeepSeek 识图);
+    # needs the Z_AI_API_KEY credential to analyze, else uploads keep the
+    # model's clear refusal.
+    - id: vision-attachment
+      name: '@deepseek-ai/dsh-vision-attachment'
+
+    - id: ui-team-tasks
+      name: '@deepseek-ai/dsh-client-ui-team-tasks'
+
     - id: ui-trajectory
       name: '@deepseek-ai/dsh-client-ui-trajectory'
 

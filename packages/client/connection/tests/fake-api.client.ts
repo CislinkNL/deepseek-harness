@@ -3,7 +3,8 @@
 // deferred-controlled timing). Streams are hand pumps: pushMux/pushHost.
 import type {
   HostFrame, IApiClient, ModelSelection, MuxFrame,
-  RpcRequest, RpcResponse, SessionId, SessionModels, SessionSearchItem, SkillEntry, WorkspaceId,
+  RpcRequest, RpcResponse, SessionId, SessionModels, SessionSearchItem, SkillEntry,
+  TeamTaskId, TeamTaskView, WorkspaceId,
 } from '../src/client/api.ts'
 import { RpcId } from '../src/client/api.ts'
 
@@ -28,6 +29,11 @@ let nextRpc = 0
 
 export function ok<T>(value: T): RpcResponse<T> {
   return { rpcId: RpcId(`fake-${nextRpc++}`), result: { ok: true, value } }
+}
+
+/** Minimal team-task wire row for stubs that never exercise the board. */
+function fakeTask(): TeamTaskView {
+  return { id: 't' as TeamTaskId, title: 'stub', priority: 'medium', status: 'todo', createdAt: 0, updatedAt: 0 }
 }
 
 
@@ -222,6 +228,14 @@ export class FakeApiClient implements IApiClient {
     providers: payload => this.record('llm.providers', payload, Promise.resolve(ok({ providers: [] }))),
     models: payload => this.record('llm.models', payload, Promise.resolve(ok({ groups: [], failures: [] }))),
     discoverModels: payload => this.record('llm.discoverModels', payload, Promise.resolve(ok({ models: [] }))),
+  }
+
+  readonly teamTasks: IApiClient['teamTasks'] = {
+    list: payload => this.record('teamTask.list', payload, Promise.resolve(ok({ tasks: [] }))),
+    create: payload => this.record('teamTask.create', payload, Promise.resolve(ok({ task: fakeTask() }))),
+    update: payload => this.record('teamTask.update', payload, Promise.resolve(ok({ task: fakeTask() }))),
+    remove: payload => this.record('teamTask.remove', payload, Promise.resolve(ok({ removed: true }))),
+    process: payload => this.record('teamTask.process', payload, Promise.resolve(ok({ task: fakeTask() }))),
   }
 
   /** When true, streams never fire onOpen (misbehaving-carrier material for the handshake timeout guard). */

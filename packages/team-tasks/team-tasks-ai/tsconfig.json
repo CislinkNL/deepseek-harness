@@ -1,0 +1,15 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": { "rootDir": "src", "outDir": "lib/types" },
+  "include": ["src"],
+  "references": [
+    { "path": "../../../vendor/cordis" },
+    { "path": "../../../vendor/schemastery" },
+    { "path": "../../core/agent" },
+    { "path": "../../preset/agent-presets" },
+    { "path": "../../llm/llm" },
+    { "path": "../../core/session" },
+    { "path": "../../team-tasks/team-tasks" },
+    { "path": "../../runtime-diagnostics/invariants" }
+  ]
+}

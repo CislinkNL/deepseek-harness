@@ -292,6 +292,9 @@ export function apply(ctx: Context): void {
           addImages: undefined,
           removeImage: undefined,
           draftImages: undefined,
+          addFiles: undefined,
+          removeFile: undefined,
+          draftFiles: undefined,
           resolveSubmitMode: (running, gesture, steeringAvailable) =>
             submissionPolicy.resolve(running, gesture, steeringAvailable),
           toggleCommandMenu: undefined,
@@ -326,6 +329,22 @@ export function apply(ctx: Context): void {
           shell.removeImage(id)
         },
         draftImages: ids => conversation.draftImages(ids),
+        addFiles: (files) => {
+          try {
+            const drafts = conversation.createDraftFiles(files)
+            if (!shell.addFiles(drafts.map(draft => draft.id))) {
+              conversation.releaseDraftFiles(drafts)
+            }
+            return null
+          } catch (error: unknown) {
+            return error instanceof Error ? error.message : String(error)
+          }
+        },
+        removeFile: (id) => {
+          conversation.releaseDraftFile(id)
+          shell.removeFile(id)
+        },
+        draftFiles: ids => conversation.draftFiles(ids),
         resolveSubmitMode: (running, gesture, steeringAvailable) =>
           submissionPolicy.resolve(running, gesture, steeringAvailable),
         toggleCommandMenu: inputTriggers === undefined

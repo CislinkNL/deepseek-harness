@@ -44,7 +44,7 @@ interface ComposerRailItem extends AttachmentRailItem {
 export type InputBarProps = ComposerBarProps
 
 export function InputBar({
-  useSession, useInput, inputActions, keyboard, addImages, removeImage, draftImages,
+  useSession, useInput, inputActions, keyboard, addImages, removeImage, draftImages, addFiles, removeFile, draftFiles,
   resolveSubmitMode, toggleCommandMenu, stop, command, t,
   renderSlot, useNotices, useLexicon, useMenuLauncher,
   useProjection, sessionId, variant, disabled: inert = false, blocked,
@@ -72,7 +72,11 @@ export function InputBar({
     () => input === undefined || draftImages === undefined ? [] : draftImages(input.imageIds),
     [draftImages, input?.imageIds],
   )
-  const empty = draft.trim() === '' && attachments.length === 0
+  const fileDrafts = useMemo(
+    () => input === undefined || draftFiles === undefined ? [] : draftFiles(input.fileIds),
+    [draftFiles, input?.fileIds],
+  )
+  const empty = draft.trim() === '' && attachments.length === 0 && fileDrafts.length === 0
   const [preview, setPreview] = useState<ComposerAttachment | null>(null)
   const [dragActive, setDragActive] = useState(false)
   // Transient error banner (image-intake rejections and prompt failures): the
@@ -102,6 +106,7 @@ export function InputBar({
       : `${promptError.error.message} (${promptError.error.code})`)
   }, [promptError, showToast, t, imageLimits])
   const inputRef = useRef<HTMLTextAreaElement | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
   const cardRef = useRef<HTMLDivElement | null>(null)
   const dragDepthRef = useRef(0)
   const scrollRef = useRef<HTMLDivElement | null>(null)
@@ -152,7 +157,10 @@ export function InputBar({
     if (attachments.length !== input.imageIds.length) {
       inputActions.pruneImages(attachments.map(attachment => attachment.id))
     }
-  }, [attachments, input?.imageIds, inputActions])
+    if (fileDrafts.length !== input.fileIds.length) {
+      inputActions.pruneFiles(fileDrafts.map(file => file.id))
+    }
+  }, [attachments, fileDrafts, input?.imageIds, input?.fileIds, inputActions])
 
   useEffect(() => {
     if (preview !== null && !attachments.some(attachment => attachment.id === preview.id)) setPreview(null)
@@ -448,6 +456,34 @@ export function InputBar({
     if (rejected !== null) showToast(rejected)
   }, [addImages, attachments, imageLimits, showToast, t])
 
+  // File intake: size pre-check mirrors the host default; the host stays
+  // authoritative at submit for callers that bypass this composer.
+  const intakeFiles = useCallback((files: readonly File[]): void => {
+    if (addFiles === undefined || files.length === 0) return
+    if (files.some(file => file.size > 10 * 1024 * 1024)) {
+      showToast(t('file.tooLarge'))
+      return
+    }
+    const rejected = addFiles(files)
+    if (rejected !== null) showToast(rejected)
+  }, [addFiles, showToast, t])
+
+  // The attach button opens the native file picker; the picker change feeds
+  // the same intake pre-check as paste and whole-page drop.
+  const onAttach = useCallback((): void => {
+    if (locked || (addImages === undefined && addFiles === undefined)) return
+    fileInputRef.current?.click()
+  }, [locked, addImages, addFiles])
+
+  const onFilePickerChange = useCallback((event: React.ChangeEvent<HTMLInputElement>): void => {
+    const files = Array.from(event.target.files ?? [])
+    event.target.value = ''
+    const images = files.filter(file => file.type.startsWith('image/'))
+    const others = files.filter(file => !file.type.startsWith('image/'))
+    if (images.length > 0) intakeImages(images)
+    if (others.length > 0) intakeFiles(others)
+  }, [intakeImages, intakeFiles])
+
   // Whole-page file-drop intake (DeepSeek Chat behavior): the listeners live
   // on the document so a drop anywhere over the window adds images, not only
   // over the composer card. Safe as document-level state: the composer-bar
@@ -686,6 +722,22 @@ export function InputBar({
             />
           </div>
         )}
+        {fileDrafts.length > 0 && (
+          <ul className={css.files} aria-label="待发送文件">
+            {fileDrafts.map(file => (
+              <li key={String(file.id)} className={css.fileChip}>
+                <span className={css.fileName}>📄 {file.name}</span>
+                <span className={css.fileSize}>{imageSizeText(file.size)}</span>
+                <button
+                  type="button"
+                  className={css.fileRemove}
+                  aria-label={t('file.remove', { name: file.name })}
+                  onClick={() => { removeFile?.(file.id) }}
+                >✕</button>
+              </li>
+            ))}
+          </ul>
+        )}
         {/* One scrollport, two text layers. The hidden mirror renders draft+'\n' and stretches the
             stack to the draft's FULL height (counting rows by '\n' cannot see soft wraps); the
             absolutely-positioned backdrop and textarea ride that height, and .scroll — capped at 14
@@ -731,6 +783,34 @@ export function InputBar({
         </div>
         <div className={css.row}>
           <div className={css.tools}>
+            <Tooltip label={t('input.attach')} side="top" delayMs={500}>
+              <button
+                type="button"
+                className={css.add}
+                aria-label={t('input.attach')}
+                disabled={locked || (addImages === undefined && addFiles === undefined)}
+                onMouseDown={keepFocus}
+                onClick={onAttach}
+              >
+                <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden>
+                  <path
+                    fill="currentColor"
+                    d="M9.5 1.8a3.2 3.2 0 0 1 4.7 4.3l-5.4 5.7a2.2 2.2 0 0 1-3.2-3l5.6-5.6a1.2 1.2 0 0 1 1.7 1.7l-5 5"
+                    fillRule="evenodd"
+                    stroke="currentColor"
+                    strokeWidth="1.4"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+            </Tooltip>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              hidden
+              onChange={onFilePickerChange}
+            />
             <Tooltip label={t('input.commands')} side="top" delayMs={500}>
               <button
                 type="button"

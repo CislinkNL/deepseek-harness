@@ -10,6 +10,7 @@ import type { WorkspaceApi } from './workspace.ts'
 import type { AgentPresetsApi } from './agent-presets.ts'
 import type { SkillsApi } from './skills.ts'
 import type { GoalsApi } from './goals.ts'
+import type { TeamTasksApi } from './team-tasks.ts'
 import type { SettingsApi } from './settings.ts'
 import type { CredentialsApi } from './credentials.ts'
 import type { LlmApi } from './llm.ts'
@@ -63,6 +64,11 @@ export interface RpcMethodMap {
   'goal.resume': GoalsApi['resume']
   'goal.complete': GoalsApi['complete']
   'goal.clear': GoalsApi['clear']
+  'teamTask.list': TeamTasksApi['list']
+  'teamTask.create': TeamTasksApi['create']
+  'teamTask.update': TeamTasksApi['update']
+  'teamTask.remove': TeamTasksApi['remove']
+  'teamTask.process': TeamTasksApi['process']
   'settings.describe': SettingsApi['describe']
   'settings.openDocument': SettingsApi['openDocument']
   'settings.update': SettingsApi['update']

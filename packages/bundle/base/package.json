@@ -45,6 +45,8 @@
     "@deepseek-ai/dsh-agent-default-model": "workspace:^",
     "@deepseek-ai/dsh-agent-loop": "workspace:^",
     "@deepseek-ai/dsh-attachment-local": "workspace:^",
+    "@deepseek-ai/dsh-team-tasks-json": "workspace:^",
+    "@deepseek-ai/dsh-team-tasks-ai": "workspace:^",
     "@deepseek-ai/dsh-shell-env": "workspace:^",
     "@deepseek-ai/dsh-bash-sandbox": "workspace:^",
     "@deepseek-ai/dsh-command-compact": "workspace:^",

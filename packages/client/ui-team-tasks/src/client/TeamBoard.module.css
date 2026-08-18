@@ -1,0 +1,173 @@
+.fab {
+  position: fixed;
+  /* Clear the composer card (send/attach controls live at its bottom-right):
+     float above it instead of covering it, phone and desktop alike. */
+  right: 20px;
+  bottom: 150px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  cursor: pointer;
+  background: var(--dsw-alias-button-floating-fill);
+  box-shadow: var(--dsw-elevation-3);
+  z-index: 100;
+}
+
+.fab:hover {
+  background: var(--dsw-alias-button-floating-hover);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: var(--dsw-alias-bg-mask-drop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 24px;
+}
+
+.panel {
+  width: min(560px, 100%);
+  max-height: 80vh;
+  overflow: auto;
+  border-radius: 12px;
+  background: var(--dsw-alias-bg-overlay);
+  border: 1px solid var(--dsw-alias-border-l);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header h2 {
+  margin: 0;
+  font-size: 16px;
+  color: var(--dsw-alias-label-primary);
+}
+
+.header button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--dsw-alias-label-dimmed);
+  font-size: 14px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form input,
+.form select,
+.form textarea {
+  border: 1px solid var(--dsw-alias-border-l);
+  border-radius: 8px;
+  padding: 8px;
+  font: inherit;
+  background: var(--dsw-alias-bg-base);
+  color: var(--dsw-alias-label-primary);
+}
+
+.form textarea {
+  resize: vertical;
+  min-height: 48px;
+}
+
+.form button {
+  align-self: flex-end;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  background: var(--dsw-alias-button-primary-fill);
+  color: var(--dsw-alias-button-primary-invert, #fff);
+}
+
+.form button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.notice {
+  margin: 0;
+  font-size: 13px;
+  color: var(--dsw-alias-label-dimmed);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.task {
+  border: 1px solid var(--dsw-alias-border-l);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.taskTitle {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-weight: 600;
+  color: var(--dsw-alias-label-primary);
+}
+
+.tag {
+  font-size: 11px;
+  border-radius: 4px;
+  padding: 1px 6px;
+  background: var(--dsw-alias-interactive-bg-hover);
+  color: var(--dsw-alias-label-dimmed);
+}
+
+.notes {
+  margin: 0;
+  font-size: 13px;
+  color: var(--dsw-alias-label-dimmed);
+  white-space: pre-wrap;
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+}
+
+.actions button {
+  border: 1px solid var(--dsw-alias-border-l);
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  background: var(--dsw-alias-button-tool-bar-fill);
+  color: var(--dsw-alias-label-primary);
+  font-size: 12px;
+}
+
+.empty {
+  text-align: center;
+  color: var(--dsw-alias-label-dimmed);
+  padding: 16px 0;
+}

@@ -4,6 +4,7 @@
 import type {
   ClientResponse, HostFrame, IApiClient, ModelSelection, MuxFrame,
   RpcError, RpcReceipt, RpcRequest, RpcResponse, SessionId, SessionModels, SessionSearchItem, SkillEntry,
+  TeamTaskId, TeamTaskView,
   WorkspaceId, WorkspaceView,
 } from '@deepseek-ai/dsh-api-remotes/client'
 import { RpcId } from '@deepseek-ai/dsh-client-connection/client'
@@ -20,6 +21,11 @@ function fakeWorkspace(id: string, over: Partial<WorkspaceView> = {}): Workspace
     updatedAt: '2026-01-01T00:00:00.000Z',
     ...over,
   }
+}
+
+/** Minimal team-task wire row for stubs that never exercise the board. */
+function fakeTask(): TeamTaskView {
+  return { id: 't' as TeamTaskId, title: 'stub', priority: 'medium', status: 'todo', createdAt: 0, updatedAt: 0 }
 }
 
 export interface Deferred<T> {
@@ -275,6 +281,14 @@ export class FakeApiClient implements IApiClient {
     providers: payload => this.record('llm.providers', payload, Promise.resolve(ok({ providers: [] }))),
     models: payload => this.record('llm.models', payload, Promise.resolve(ok({ groups: [], failures: [] }))),
     discoverModels: payload => this.record('llm.discoverModels', payload, Promise.resolve(ok({ models: [] }))),
+  }
+
+  readonly teamTasks: IApiClient['teamTasks'] = {
+    list: payload => this.record('teamTask.list', payload, Promise.resolve(ok({ tasks: [] }))),
+    create: payload => this.record('teamTask.create', payload, Promise.resolve(ok({ task: fakeTask() }))),
+    update: payload => this.record('teamTask.update', payload, Promise.resolve(ok({ task: fakeTask() }))),
+    remove: payload => this.record('teamTask.remove', payload, Promise.resolve(ok({ removed: true }))),
+    process: payload => this.record('teamTask.process', payload, Promise.resolve(ok({ task: fakeTask() }))),
   }
 
   /** When true, streams never fire onOpen (misbehaving-carrier material for the handshake timeout guard). */
