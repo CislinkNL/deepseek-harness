@@ -23,11 +23,17 @@ llm-pi-ai:
       apiKeyEnv: CLIPROXY_API_KEY
       api: openai-completions
       baseURL: http://127.0.0.1:8317/v1
+      defaultInput:
+        - text
+        - image
       models:
         - id: gemini-3.7-flash-high
           name: Gemini 3.7 Flash High
           contextWindow: 1000000
           maxTokens: 65536
+          input:
+            - text
+            - image
           reasoningEfforts:
             "off": null
             low: low
@@ -37,6 +43,9 @@ llm-pi-ai:
           name: Gemini 3.6 Flash High
           contextWindow: 1000000
           maxTokens: 65536
+          input:
+            - text
+            - image
           reasoningEfforts:
             "off": null
             low: low
@@ -46,6 +55,9 @@ llm-pi-ai:
           name: Gemini 3.1 Pro Low
           contextWindow: 1000000
           maxTokens: 65536
+          input:
+            - text
+            - image
           reasoningEfforts:
             "off": null
             low: low
@@ -55,6 +67,9 @@ llm-pi-ai:
           name: Claude Opus 4.6 Thinking
           contextWindow: 200000
           maxTokens: 32768
+          input:
+            - text
+            - image
           reasoningEfforts:
             "off": null
             low: low
@@ -64,6 +79,9 @@ llm-pi-ai:
           name: Claude Sonnet 4.6
           contextWindow: 200000
           maxTokens: 32768
+          input:
+            - text
+            - image
           reasoningEfforts:
             "off": null
             low: low
@@ -73,6 +91,9 @@ llm-pi-ai:
           name: Gemini 3.5 Flash Low
           contextWindow: 1000000
           maxTokens: 65536
+          input:
+            - text
+            - image
           reasoningEfforts:
             "off": null
             low: low

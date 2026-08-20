@@ -273,13 +273,12 @@
     - id: vision-http
       name: '@deepseek-ai/dsh-vision-http'
       config:
-        # glm-4v-flash is retired on Z.ai (HTTP 400 unknown model); glm-5v-turbo
-        # is the current vision tier verified against the endpoint.
-        model: glm-5v-turbo
+        baseURL: http://127.0.0.1:8317/v1
+        model: gemini-3.7-flash-high
+        apiKeyEnv: CLIPROXY_API_KEY
 
     # Converts image uploads to text for text-only routes (DeepSeek 识图);
-    # needs the Z_AI_API_KEY credential to analyze, else uploads keep the
-    # model's clear refusal.
+    # uses local CLIProxy / Gemini vision to analyze image uploads for text-only models.
     - id: vision-attachment
       name: '@deepseek-ai/dsh-vision-attachment'
 
