@@ -54,6 +54,49 @@ export const en: Record<PluginsSettingsLocaleKey, string> = {
 }
 
 /** Simplified Chinese copy. */
+
+/** Dutch copy. */
+export const nl: Record<PluginsSettingsLocaleKey, string> = {
+  nav: 'Plug-ins',
+  title: 'Plug-ins',
+  intro: 'Configureer en inspecteer de plug-ins die in deze omgeving zijn geïnstalleerd.',
+  tabs: 'Plug-inweergaven',
+  configurableTab: 'Plug-inconfiguratie',
+  empty: 'Deze omgeving biedt geen instellingen voor plug-ins.',
+  overridden: 'Aangepast',
+  reset: 'Standaard herstellen',
+  readOnly: 'Deze omgeving slaat instellingen alleen-lezen op.',
+  expand: 'Instellingen tonen',
+  collapse: 'Instellingen verbergen',
+  save: 'Opslaan',
+  saving: 'Opslaan…',
+  discard: 'Wijzigingen verwerpen',
+  unsaved: 'Niet opgeslagen',
+  saveFailed: 'De omgeving accepteerde deze waarden niet; u kunt ze corrigeren.',
+  invalidNumber: 'Voer een getal in of laat leeg om de standaardwaarde te gebruiken.',
+  bashTitle: 'Shell',
+  bashDescription: 'Beperkingen voor elke opdracht die de agent uitvoert.',
+  bashTimeoutMs: 'Opdracht-time-out (ms)',
+  bashTimeoutMsHint: 'Hoe lang één opdracht mag draaien voordat deze wordt beëindigd.',
+  bashMaxOutputBytes: 'Maximale uitvoer per stream (bytes)',
+  bashMaxOutputBytesHint: 'Uitvoer die dit overschrijdt, wordt opgeslagen in een tijdelijk bestand in plaats van verloren te gaan.',
+  agentLoopTitle: 'Agent-loop',
+  agentLoopDescription: 'Hoe de agent tool-aanroepen verdeelt.',
+  agentLoopMaxParallel: 'Parallelle tool-aanroepen',
+  agentLoopMaxParallelHint: 'Bovengrens voor veilige parallelle aanroepen binnen één stap.',
+  webSearchTitle: 'Webzoekfunctie',
+  webSearchDescription: 'De DeepSeek zoekaanbieder.',
+  webSearchApiKey: 'API-sleutel',
+  webSearchApiKeyHint: 'Opgeslagen buiten het configuratiebestand. Laat leeg om de huidige sleutel te behouden.',
+  webSearchApiKeySet: 'Een sleutel is geconfigureerd.',
+  webSearchApiKeyUnset: 'Geen sleutel geconfigureerd; zoekfunctie is niet beschikbaar totdat deze is ingesteld.',
+  webSearchBaseUrl: 'Eindpunt',
+  webSearchBaseUrlHint: 'Laat leeg om de standaardwaarde van de aanbieder te gebruiken.',
+  webSearchMaxUses: 'Max. zoekopdrachten per verzoek',
+  webSearchMaxUsesHint: 'Hoe vaak één verzoek mag zoeken voordat het moet antwoorden.',
+}
+
+/** Simplified Chinese copy. */
 export const zh: Record<PluginsSettingsLocaleKey, string> = {
   nav: '插件',
   title: '插件',

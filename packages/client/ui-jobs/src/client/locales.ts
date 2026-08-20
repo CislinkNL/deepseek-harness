@@ -43,3 +43,22 @@ export const en: Record<JobKey, string> = {
 
 /** Key domain of the `job` namespace (zh is the source of truth). */
 export type JobKey = keyof typeof zh
+
+/** Dutch dictionary, key-identical to the Chinese source of truth. */
+export const nl: Record<JobKey, string> = {
+  'count.live.one': '{count} achtergrondtaak actief',
+  'count.live.other': '{count} achtergrondtaken actief',
+  'count.idle.one': '{count} achtergrondtaak',
+  'count.idle.other': '{count} achtergrondtaken',
+  'list.aria': 'Achtergrondtaken',
+  'status.running': 'actief',
+  'status.stopping': 'stoppen…',
+  'status.completed': 'voltooid',
+  'status.killed': 'geannuleerd',
+  'status.failed': 'mislukt',
+  'duration.seconds': '{seconds}s',
+  'duration.minutes': '{minutes}m {seconds}s',
+  'duration.hours': '{hours}u {minutes}m',
+  'duration.title.live': 'Loopt al {duration}',
+  'duration.title.done': 'Duurde {duration}',
+}

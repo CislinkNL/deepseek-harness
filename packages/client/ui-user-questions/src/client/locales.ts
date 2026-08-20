@@ -36,3 +36,20 @@ export const en = {
   'plan.decline': 'Refuse',
   'plan.discuss': 'Chat about it',
 } satisfies Record<QuestionKey, string>
+
+/** Dutch dictionary, checked complete against the zh key set. */
+export const nl = {
+  'error.incomplete': 'Voltooi deze vraag eerst.',
+  'error.unanswered': 'Selecteer een optie of vul een aangepast antwoord in.',
+  'nav.prev': 'Vorige vraag',
+  'nav.next': 'Volgende vraag',
+  'nav.cancel': 'Alle vragen sluiten',
+  'option.recommended': 'Aanbevolen',
+  'custom.placeholder': 'Typ uw antwoord',
+  'action.skip': 'Deze vraag overslaan',
+  'action.next': 'Volgende',
+  'plan.header': 'Planbeoordeling',
+  'plan.approve': 'Goedkeuren',
+  'plan.decline': 'Weigeren',
+  'plan.discuss': 'In chat bespreken',
+} satisfies Record<QuestionKey, string>

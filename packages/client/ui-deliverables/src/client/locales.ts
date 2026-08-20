@@ -23,3 +23,12 @@ export const en: Record<DeliverablesKey, string> = {
 
 /** Union of this namespace's dictionary keys. */
 export type DeliverablesKey = keyof typeof zh
+
+/** Dutch dictionary (same key set). */
+export const nl: Record<DeliverablesKey, string> = {
+  'produced.label': 'Geproduceerd',
+  'produced.moreOne': '+ 1 bestand',
+  'produced.more': '+ {count} bestanden',
+  'produced.open': '{name} openen',
+  'produced.showInFolder': 'In map tonen',
+}

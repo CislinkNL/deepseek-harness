@@ -49,3 +49,25 @@ export const en: Record<WorkflowRunKey, string> = {
 
 /** Union of this namespace's dictionary keys. */
 export type WorkflowRunKey = keyof typeof zh
+
+/** Dutch dictionary (same key set). */
+export const nl: Record<WorkflowRunKey, string> = {
+  'run.title': '{name}',
+  'run.members.one': '{count} lid',
+  'run.members.other': '{count} leden',
+  'run.empty': 'Geen gestarte leden',
+  'phase.unassigned': 'Niet gefaseerd',
+  'phase.empty': 'Lege fasenaam',
+  'statusCount.running': 'In uitvoering {count}',
+  'statusCount.completed': 'Voltooid {count}',
+  'statusCount.failed': 'Mislukt {count}',
+  'statusCount.cancelled': 'Geannuleerd {count}',
+  'statusCount.interrupted': 'Onderbroken {count}',
+  'member.empty': 'Lege lidnaam',
+  'member.open': '{name} openen',
+  'status.running': 'In uitvoering',
+  'status.completed': 'Voltooid',
+  'status.failed': 'Mislukt',
+  'status.cancelled': 'Geannuleerd',
+  'status.interrupted': 'Onderbroken',
+}

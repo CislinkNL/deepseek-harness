@@ -24,3 +24,12 @@ export const en = {
   'loading': 'Loading…',
   'suggestions.aria': 'Trigger suggestions',
 } satisfies Record<MenuKey, string>
+
+/** Dutch dictionary, checked complete against the zh key set. */
+export const nl = {
+  'command': 'Commando\'s',
+  'skill': 'Skills',
+  'subagent': 'Subagenten',
+  'loading': 'Laden…',
+  'suggestions.aria': 'Suggesties voor triggers',
+} satisfies Record<MenuKey, string>

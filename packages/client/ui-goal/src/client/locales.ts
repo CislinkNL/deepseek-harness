@@ -32,3 +32,18 @@ export const en = {
   'action.edit': 'Edit goal',
   'action.clear': 'Clear goal',
 } satisfies Record<GoalKey, string>
+
+/** Dutch dictionary, checked complete against the zh key set. */
+export const nl = {
+  'phase.active': 'Lopend doel',
+  'phase.paused': 'Gepauzeerd doel',
+  'phase.blocked': 'Geblokkeerd doel',
+  'objective.aria': 'Doelomschrijving',
+  'commandInput.aria': 'Opdrachtinvoer',
+  'action.save': 'Doel opslaan',
+  'action.cancel': 'Bewerken annuleren',
+  'action.pause': 'Doel pauzeren',
+  'action.resume': 'Doel hervatten',
+  'action.edit': 'Doel bewerken',
+  'action.clear': 'Doel wissen',
+} satisfies Record<GoalKey, string>

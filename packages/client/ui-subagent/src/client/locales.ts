@@ -79,3 +79,40 @@ export const en: Record<SubagentKey, string> = {
 
 /** Key domain of the `subagent` namespace (zh is the source of truth). */
 export type SubagentKey = keyof typeof zh
+
+/** Dutch dictionary, key-identical to the Chinese source of truth. */
+export const nl: Record<SubagentKey, string> = {
+  'diagnostic.corrupt': 'beschadigd sessiebestand',
+  'diagnostic.unsupported': 'niet-ondersteunde versie van subagentrecord',
+  'diagnostic.unavailable': 'sessiebestand tijdelijk niet beschikbaar',
+  'duration.seconds': '{seconds}s',
+  'duration.minutes': '{minutes}m {seconds}s',
+  'duration.hours': '{hours}u {minutes}m {seconds}s',
+  'duration.days': '{days}d',
+  'duration.daysHours': '{days}d {hours}u',
+  'duration.months': '~{months}mnd',
+  'duration.monthsDays': '~{months}mnd {days}d',
+  'duration.years': '~{years}j',
+  'duration.yearsMonths': '~{years}j {months}mnd',
+  'duration.exactDays': '{days}d {hours}u {minutes}m {seconds}s',
+  'duration.exactTitle': 'Totale actieve duur: {duration}',
+  'loading.label': 'Subagenten laden…',
+  'loading.aria': 'Subagenten laden',
+  'load.error': 'Kan subagenten niet laden',
+  'retry': 'Opnieuw proberen',
+  'mode.oneShot': 'eenmalig',
+  'mode.continuable': 'voortzetbaar',
+  'activity.running': 'in uitvoering',
+  'activity.inactive': 'niet actief',
+  'branch.collapse': '{label} afstammelingen inklappen',
+  'branch.expand': '{label} afstammelingen uitklappen',
+  'count.total.one': '{count} subagent',
+  'count.total.other': '{count} subagenten',
+  'count.running.one': '{count} subagent actief',
+  'count.running.other': '{count} subagenten actief',
+  'tree.aria': 'Subagentsessies',
+  'readonly.oneShot.title': 'Eenmalige subagentrecord',
+  'readonly.title': 'Deze subagent is voorlopig alleen-lezen',
+  'readonly.oneShot.body': 'Eenmalige taken accepteren geen vervolgberichten; bekijk hier de volledige uitvoeringsgeschiedenis.',
+  'readonly.body': 'De hoofdsessie is offline; heropen deze om door te gaan met het verzenden van berichten.',
+}

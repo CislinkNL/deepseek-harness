@@ -49,3 +49,25 @@ export const accessEn = {
   'confirm.cancel': 'Cancel',
   'confirm.enable': 'Enable Full access',
 } satisfies Record<PermissionAccessKey, string>
+
+/** Dutch dictionary, checked complete against the zh key set. */
+export const nl = {
+  'title': 'Machtigingen',
+  'description': 'Kies de standaard machtigingsmodus voor nieuwe sessies',
+  'loading': 'Laden',
+  'unavailable': 'Niet beschikbaar',
+  'confirm.title': 'Volledige toegang inschakelen?',
+  'confirm.description': 'Met volledige toegang worden bevestigingsstappen verminderd en kan de agent direct meer acties uitvoeren, waaronder gevoelige operaties, bestandswijzigingen of externe opdrachten. Gebruik dit alleen als u latere taken vertrouwt.',
+  'confirm.acknowledge': 'Ik begrijp de risico\'s en wil doorgaan',
+  'confirm.cancel': 'Annuleren',
+  'confirm.enable': 'Volledige toegang inschakelen',
+} satisfies Record<PermissionSettingsKey, string>
+
+/** Dutch dictionary for the current-session popup gate. */
+export const accessNl = {
+  'confirm.title': 'Volledige toegang inschakelen?',
+  'confirm.description': 'Met volledige toegang worden bevestigingsstappen verminderd en kan de agent direct meer acties uitvoeren, waaronder gevoelige operaties, bestandswijzigingen of externe opdrachten. Gebruik dit alleen als u de huidige taak vertrouwt.',
+  'confirm.acknowledge': 'Ik begrijp de risico\'s en wil doorgaan',
+  'confirm.cancel': 'Annuleren',
+  'confirm.enable': 'Volledige toegang inschakelen',
+} satisfies Record<PermissionAccessKey, string>

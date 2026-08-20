@@ -52,3 +52,24 @@ export const en = {
   'blocked.composer': 'This model is unavailable — select one to continue',
   'empty.efforts': 'This model provides no reasoning effort levels.',
 } satisfies Record<ModelKey, string>
+
+/** Dutch dictionary, checked complete against the zh key set. */
+export const nl = {
+  'command.description': 'Selecteer het model voor dit gesprek',
+  'option.loadError': 'Catalogus laden mislukt: {message}',
+  'trigger.fallback': 'Model selecteren',
+  'trigger.selectAria': 'Model selecteren',
+  'trigger.aria': 'Model selecteren, huidig {model}',
+  'trigger.ariaEffort': 'Model selecteren, huidig {model}, redeneerniveau {effort}',
+  'menu.aria': 'Model en redeneerniveau',
+  'menu.model': 'Model',
+  'menu.effort': 'Niveau',
+  'effort.providerDefault': 'Standaard',
+  'status.loading': 'Modellijst vernieuwen…',
+  'error.action': 'Modelbewerking mislukt: {message}',
+  'action.reload': 'Opnieuw laden',
+  'warning.groupLoad': '{name} laden mislukt: {message}',
+  'empty.models': 'Geen modellen beschikbaar.',
+  'blocked.composer': 'Dit model is niet beschikbaar — kies een ander model om door te gaan',
+  'empty.efforts': 'Dit model biedt geen instelbare redeneerniveaus.',
+} satisfies Record<ModelKey, string>

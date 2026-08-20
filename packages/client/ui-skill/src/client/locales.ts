@@ -23,3 +23,12 @@ export const en = {
   'row.instructions': 'Instructions',
   'menu.userOnly': 'user-only',
 } satisfies Record<SkillKey, string>
+
+/** Dutch dictionary, checked complete against the zh key set. */
+export const nl = {
+  'row.running': 'Skill laden',
+  'row.failed': 'Skill laden mislukt',
+  'row.stopped': 'Skill laden gestopt',
+  'row.instructions': 'Instructies',
+  'menu.userOnly': 'alleen gebruiker',
+} satisfies Record<SkillKey, string>

@@ -41,3 +41,19 @@ export const en = {
   'error.load': 'Could not load feedback',
   'error.generic': 'Could not save feedback',
 } satisfies Record<MessageFeedbackKey, string>
+
+/** Dutch dictionary, checked complete against the zh key set. */
+export const nl = {
+  'action.like': 'Goed antwoord',
+  'action.likeActive': 'Beoordeling verwijderen',
+  'action.dislike': 'Slecht antwoord',
+  'action.dislikeActive': 'Beoordeling verwijderen',
+  'note.open': 'Notitie toevoegen',
+  'note.placeholder': 'Wat was er goed of wat ging er mis? (optioneel)',
+  'note.save': 'Opslaan',
+  'note.cancel': 'Annuleren',
+  'note.aria': 'Feedbacknotitie',
+  'error.conflict': 'Deze feedback is elders gewijzigd; de meest recente status wordt getoond',
+  'error.load': 'Kan feedback niet laden',
+  'error.generic': 'Kan feedback niet opslaan',
+} satisfies Record<MessageFeedbackKey, string>

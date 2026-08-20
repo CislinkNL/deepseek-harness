@@ -62,3 +62,21 @@ export const en: Record<TrajectoryKey, string> = {
   'toolbar.search': 'Search trajectory',
   'toolbar.searchPlaceholder': 'Search',
 }
+
+/** Dutch dictionary. */
+export const nl: Record<TrajectoryKey, string> = {
+  'view.trajectory': 'Traject',
+  'toolbar.aria': 'Traject-werkbalk',
+  'toolbar.duration': 'Duur',
+  'toolbar.useActualDuration': 'Werkelijke duur gebruiken',
+  'toolbar.useEqualWidth': 'Bewerkingen met gelijke breedte',
+  'toolbar.actualTime': 'Werkelijke tijd',
+  'toolbar.turns': 'Beurten',
+  'toolbar.expandTurns': 'Beurten uitklappen',
+  'toolbar.collapseTurns': 'Beurten inklappen',
+  'toolbar.calls': 'Aanroepen',
+  'toolbar.expandCalls': 'Aanroepen uitklappen',
+  'toolbar.collapseCalls': 'Aanroepen inklappen',
+  'toolbar.search': 'Traject doorzoeken',
+  'toolbar.searchPlaceholder': 'Zoeken',
+}

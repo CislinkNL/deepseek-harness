@@ -46,3 +46,25 @@ export const en = {
   failed: 'Mount failed',
   unloading: 'Unloading',
 } satisfies Record<PluginInventoryLocaleKey, string>
+
+/** Dutch dictionary checked against the Chinese key set. */
+export const nl = {
+  tab: 'Plug-inlijst',
+  loading: 'Plug-ins lezen…',
+  error: 'Plug-ins zijn tijdelijk niet beschikbaar.',
+  retry: 'Opnieuw proberen',
+  search: 'Plug-ins zoeken',
+  catalog: 'Plug-inoverzicht',
+  empty: 'Geen plug-ins beschikbaar.',
+  emptySearch: 'Geen overeenkomende plug-ins.',
+  enabledTag: 'Ingeschakeld',
+  disabledTag: 'Uitgeschakeld',
+  configuration: 'Configuratie',
+  cordis: 'Cordis-status',
+  unobserved: 'Niet gekoppeld',
+  pending: 'Wachten op afhankelijkheden',
+  loadingPhase: 'Laden',
+  active: 'Gekoppeld',
+  failed: 'Koppeling mislukt',
+  unloading: 'Ontkoppelen',
+} satisfies Record<PluginInventoryLocaleKey, string>

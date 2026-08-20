@@ -18,3 +18,11 @@ export const en = {
   'chip.off.aria': 'Plan mode off, press to turn on',
   'chip.off.title': 'Plan mode off — click to turn on (/plan)',
 } satisfies Record<PlanKey, string>
+
+/** Dutch dictionary, checked complete against the zh key set. */
+export const nl = {
+  'chip.on.aria': 'Planmodus ingeschakeld, klik om uit te schakelen',
+  'chip.on.title': 'Planmodus ingeschakeld — klik om uit te schakelen (/plan off)',
+  'chip.off.aria': 'Planmodus uitgeschakeld, klik om in te schakelen',
+  'chip.off.title': 'Planmodus uitgeschakeld — klik om in te schakelen (/plan)',
+} satisfies Record<PlanKey, string>

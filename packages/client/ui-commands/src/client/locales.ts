@@ -24,3 +24,14 @@ export const en = {
   'overlay.aria': '/{command} options',
   'listbox.aria': '/{command} matches',
 } satisfies Record<CommandKey, string>
+
+/** Dutch dictionary, checked complete against the zh key set. */
+export const nl = {
+  'search.placeholder': 'Zoeken…',
+  'search.aria': 'Opties filteren',
+  'status.loading': 'Opties laden…',
+  'status.applying': 'Toepassen…',
+  'status.empty': 'Geen opties',
+  'overlay.aria': '/{command} opties',
+  'listbox.aria': '/{command} overeenkomsten',
+} satisfies Record<CommandKey, string>

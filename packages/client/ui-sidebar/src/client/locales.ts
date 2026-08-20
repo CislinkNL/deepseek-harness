@@ -18,3 +18,11 @@ export const en = {
   'toggle.open': 'Open sidebar',
   'toggle.collapse': 'Collapse sidebar',
 } satisfies Record<SidebarKey, string>
+
+/** Dutch dictionary, checked complete against the zh key set. */
+export const nl = {
+  'session.new': 'Nieuwe sessie',
+  'session.new.label': 'Nieuwe sessie aanmaken',
+  'toggle.open': 'Zijbalk openen',
+  'toggle.collapse': 'Zijbalk inklappen',
+} satisfies Record<SidebarKey, string>

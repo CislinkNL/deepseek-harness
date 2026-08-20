@@ -85,6 +85,74 @@ export const en: Record<AgentPresetSettingsKey, string> = {
 }
 
 /** Simplified Chinese copy. */
+
+/** Dutch copy. */
+export const nl: Record<AgentPresetSettingsKey, string> = {
+  title: 'Agent-voorinstelling',
+  description: 'Geldt voor sessies die u vanaf nu start. Actieve sessies behouden de voorinstelling waarmee ze zijn gestart.',
+  loading: 'Voorinstellingen laden…',
+  error: 'Kan agent-voorinstellingen niet laden.',
+  userTrust: 'Aangepast',
+  seatHint: 'Agent-voorinstelling voor de sessie die u gaat starten',
+  headerHint: 'De agent-voorinstelling die deze sessie gebruikt, vastgelegd bij de start',
+  nav: 'Agent-voorinstellingen',
+  sectionIntro:
+    'Een voorinstelling is de plug-insamenstelling die de agent van een sessie uitvoert — de tools, prompt en mogelijkheden. '
+    + 'Dupliceer een bestaande en pas deze aan, of laat de agent er een opstellen in Creatormodus.',
+  builtIn: 'Ingebouwd',
+  setDefault: 'Als standaard instellen',
+  view: 'Bekijken',
+  presetStandardName: 'Standaardmodus',
+  presetStandardDescription:
+    'Volledige programmeeragent met bestandsbewerking, shell, bestands- en webzoekfunctie, skills, planning, doelen, subagenten en workflows.',
+  presetCodeName: 'Codemodus',
+  presetCodeDescription:
+    'Alle mogelijkheden van de standaardmodus, met tools via de Code Mode SDK zodat het model meerdere stappen kan combineren in één TypeScript-programma.',
+  presetMinimalName: 'Minimale modus',
+  presetMinimalDescription:
+    'Programmeeragent met twee tools: persistente bash en str_replace_editor.',
+  presetCordisName: 'Creatormodus',
+  presetCordisDescription:
+    'Ontworpen voor het maken van aangepaste agent-voorinstellingen, met alle standaardmogelijkheden plus runtime-inspectie, plug-inexperimenten en ontwerpondersteuning.',
+  duplicate: 'Dupliceren',
+  duplicateUnavailable: 'Deze installatie heeft geen beschrijfbare map voor voorinstellingen',
+  delete: 'Verwijderen',
+  presetId: 'Identificatie',
+  presetIdPlaceholder: 'mijn-agent',
+  displayName: 'Naam',
+  displayNamePlaceholder: 'Weergegeven in de kiezer; standaard de identificatie',
+  inUse: 'In gebruik',
+  builtInGroup: 'Ingebouwd',
+  customGroup: 'Aangepast',
+  noDescription: 'Geen beschrijving.',
+  brokenBadge: 'Laden mislukt',
+  brokenNoCopy: 'Een voorinstelling die niet kon worden geladen kan niet worden gedupliceerd',
+  copyOf: 'Gekopieerd van',
+  composition: 'Samenstelling (agent.cordis.yml)',
+  cancel: 'Annuleren',
+  close: 'Sluiten',
+  retry: 'Opnieuw proberen',
+  copyTitle: 'Voorinstelling dupliceren',
+  copyIntro:
+    'De volledige voorinstelling wordt op dit systeem gekopieerd. De identificatie wordt de mapnaam en kan later niet worden gewijzigd; '
+    + 'alle andere onderdelen worden in de bestanden van de voorinstelling bewerkt.',
+  create: 'Aanmaken',
+  creating: 'Aanmaken…',
+  creatorDraft: 'Aangepaste voorinstelling ontwerpen met Creatormodus',
+  openLocation: 'Map openen',
+  showLocation: 'Locatie tonen',
+  revealedPathLabel: 'Voorinstellingsbestanden:',
+  idRequired: 'Geef de voorinstelling een identificatie.',
+  idInvalid: 'Gebruik kleine letters, cijfers en koppeltekens, beginnend met een letter of cijfer.',
+  idTaken: 'Er bestaat al een voorinstelling met deze identificatie.',
+  deleteTitle: 'Deze voorinstelling verwijderen?',
+  deleteDescription:
+    'De map van de voorinstelling wordt verwijderd. Reeds actieve sessies blijven werken; nieuwe sessies kunnen deze niet meer selecteren.',
+  deleteConfirm: 'Verwijderen',
+  deleting: 'Verwijderen…',
+}
+
+/** Simplified Chinese copy. */
 export const zh: Record<AgentPresetSettingsKey, string> = {
   title: 'Agent 预设',
   description: '对此后新建的会话生效。运行中的会话保持它开始时的预设。',
