@@ -313,3 +313,21 @@ select,
 textarea {
   font-family: inherit;
 }
+
+/* Tooltip / popover floating contrast — crisp light paper text on dark plate */
+[role="tooltip"],
+[class*="tooltip"],
+[class*="Tooltip"],
+[class*="bubble"],
+[class*="HoverCard"] {
+  background-color: #1C1B18 !important;
+  color: #ECE7DC !important;
+  border: 1px solid rgba(236, 231, 220, 0.18) !important;
+}
+
+[role="tooltip"] *,
+[class*="tooltip"] *,
+[class*="Tooltip"] *,
+[class*="bubble"] * {
+  color: #ECE7DC !important;
+}

@@ -13,10 +13,11 @@
      max-content sizes by the label alone, capped at half the viewport. */
   width: max-content;
   max-width: 50vw;
-  padding: 3px 7px;
-  border-radius: 8px;
-  background: var(--dsw-alias-tooltip-bg);
-  color: var(--dsw-static-neutral-bluish-00);
+  padding: 4px 8px;
+  border-radius: 0px;
+  background: #1C1B18;
+  color: #ECE7DC;
+  border: 1px solid rgba(236, 231, 220, 0.15);
   font-size: 13px;
   line-height: 20px;
   white-space: pre-line;

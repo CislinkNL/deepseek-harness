@@ -18,3 +18,10 @@ export const en = {
   'appearance.dark': 'Dark',
   'appearance.system': 'System',
 } satisfies Record<ThemeKey, string>
+
+export const nl = {
+  'theme.title': 'Uiterlijk',
+  'theme.light': 'Licht',
+  'theme.dark': 'Donker',
+  'theme.system': 'Systeem volgen',
+} satisfies Record<ThemeKey, string>

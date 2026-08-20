@@ -22,3 +22,11 @@ export const en = {
   'openDocument.error': 'Could not open configuration file',
   'general.nav': 'General',
 } satisfies Record<SettingsKey, string>
+
+export const nl = {
+  'general.title': 'Algemeen',
+  'enterBehavior.title': 'Enter-toets gedrag bij drukte',
+  'enterBehavior.desc': 'Alleen van kracht tijdens agent-uitvoering; Cmd/Ctrl+Enter activeert de andere optie',
+  'enterBehavior.queue': 'In wachtrij plaatsen',
+  'enterBehavior.steer': 'Direct sturen',
+} satisfies Record<GeneralSettingsKey, string>
