@@ -19,9 +19,10 @@ export const en = {
   'appearance.system': 'System',
 } satisfies Record<ThemeKey, string>
 
+/** Dutch dictionary, checked complete against the zh key set. */
 export const nl = {
-  'theme.title': 'Uiterlijk',
-  'theme.light': 'Licht',
-  'theme.dark': 'Donker',
-  'theme.system': 'Systeem volgen',
+  'appearance.title': 'Uiterlijk',
+  'appearance.light': 'Licht',
+  'appearance.dark': 'Donker',
+  'appearance.system': 'Systeem volgen',
 } satisfies Record<ThemeKey, string>

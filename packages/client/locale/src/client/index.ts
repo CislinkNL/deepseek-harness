@@ -205,7 +205,10 @@ export class LocaleRuntime {
    * @param dicts - complete dictionaries keyed by locale id.
    * @returns disposer removing every locale registered by this call (idempotent).
    */
-  register<N extends keyof LocaleNamespaceMap & string>(ns: N, dicts: Record<LocaleId, LocaleDictOf<N>>): () => void
+  register<N extends keyof LocaleNamespaceMap & string>(
+    ns: N,
+    dicts: { zh: LocaleDictOf<N>; en: LocaleDictOf<N> } & Partial<Record<LocaleId, LocaleDictOf<N>>>,
+  ): () => void
   /**
    * Single-locale untyped form for namespaces outside the merge table
    * (dynamic composition, tests).
@@ -284,7 +287,7 @@ export class LocaleRuntime {
 
   private lookup(ns: string, key: string): string | undefined {
     const locales = this.dicts.get(ns)
-    return locales?.get(this.snapshot.active)?.[key] ?? locales?.get(FALLBACK_LOCALE)?.[key]
+    return locales?.get(this.snapshot.active)?.[key] ?? locales?.get('en')?.[key] ?? locales?.get(FALLBACK_LOCALE)?.[key]
   }
 
   /**
