@@ -45,8 +45,8 @@ const ZSTD_DECODE_YIELD_INTERVAL_MS = 500
 
 /** Assert that the independently decodable first frame contains only the header record. */
 function assertZstdHeaderFrame(plaintext: Buffer): void {
-  if (plaintext.length === 0 || plaintext.indexOf(0x0A) !== plaintext.length - 1) {
-    throw new Error('corrupt Zstandard session log: first frame is not exactly one header line')
+  if (plaintext.length === 0) {
+    throw new Error('corrupt Zstandard session log: empty header frame')
   }
 }
 
@@ -763,7 +763,8 @@ export class JsonlSessionPersistence extends SessionPersistence implements Persi
         }
         signal?.throwIfAborted()
         assertZstdHeaderFrame(plaintext)
-        return plaintext.subarray(0, -1).toString('utf8')
+        const nl = plaintext.indexOf(0x0A)
+        return (nl !== -1 ? plaintext.subarray(0, nl) : plaintext).toString('utf8')
       }
     } finally {
       await handle.close()

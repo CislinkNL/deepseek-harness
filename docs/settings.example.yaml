@@ -1,0 +1,76 @@
+# ==============================================================================
+# DeepSeek Harness - Multi-Provider Configuration Template
+# Place active config at: ~/.dsh/settings.yaml (or %USERPROFILE%\.dsh\settings.yaml)
+# Secrets belong in: ~/.dsh/env (or %USERPROFILE%\.dsh\env)
+# ==============================================================================
+
+# Default model used for new agent sessions
+agent-default-model:
+  provider: antigravity
+  model: gemini-3.7-flash-high
+  reasoningEffort: high
+
+# 1. DeepSeek Official Plugin (Dedicated Adapter)
+llm-deepseek:
+  apiKeyEnv: DEEPSEEK_API_KEY
+  baseURL: https://api.deepseek.com
+  models:
+    - id: deepseek-chat
+      name: DeepSeek Chat (V4)
+      contextWindow: 128000
+      maxTokens: 8192
+    - id: deepseek-reasoner
+      name: DeepSeek Reasoner (R1)
+      contextWindow: 128000
+      maxTokens: 8192
+
+# 2. Pi-AI Multi-Provider Plugin (CLIProxy Antigravity, GLM, etc.)
+llm-pi-ai:
+  providers:
+    antigravity:
+      displayName: Antigravity (CLIProxy)
+      apiKeyEnv: CLIPROXY_API_KEY
+      api: openai-completions
+      baseURL: http://127.0.0.1:8317/v1
+      models:
+        - id: gemini-3.7-flash-high
+          name: Gemini 3.7 Flash High
+          contextWindow: 1000000
+          maxTokens: 65536
+        - id: gemini-3.6-flash-high
+          name: Gemini 3.6 Flash High
+          contextWindow: 1000000
+          maxTokens: 65536
+        - id: gemini-3.1-pro-low
+          name: Gemini 3.1 Pro Low
+          contextWindow: 1000000
+          maxTokens: 65536
+        - id: claude-opus-4-6-thinking
+          name: Claude Opus 4.6 Thinking
+          contextWindow: 200000
+          maxTokens: 32768
+        - id: claude-sonnet-4-6
+          name: Claude Sonnet 4.6
+          contextWindow: 200000
+          maxTokens: 32768
+        - id: gemini-3.5-flash-low
+          name: Gemini 3.5 Flash Low
+          contextWindow: 1000000
+          maxTokens: 65536
+    glm:
+      displayName: GLM (Zhipu)
+      apiKeyEnv: GLM_API_KEY
+      api: anthropic-messages
+      baseURL: https://api.z.ai/api/anthropic
+      thinkingBudgets:
+        medium: 8192
+        high: 32768
+      models:
+        - id: glm-5.3
+          name: GLM-5.3
+          contextWindow: 1000000
+          maxTokens: 98304
+          reasoningEfforts:
+            "off": null
+            medium: medium
+            high: high
