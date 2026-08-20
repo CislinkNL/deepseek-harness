@@ -7,12 +7,12 @@ llm-deepseek:
   apiKeyEnv: DEEPSEEK_API_KEY
   baseURL: https://api.deepseek.com
   models:
-    - id: deepseek-chat
-      name: DeepSeek Chat (V4)
+    - id: deepseek-v4-flash
+      name: DeepSeek-V4-Flash
       contextWindow: 128000
       maxTokens: 8192
-    - id: deepseek-reasoner
-      name: DeepSeek Reasoner (R1)
+    - id: deepseek-v4-pro
+      name: DeepSeek-V4-Pro
       contextWindow: 128000
       maxTokens: 8192
 
