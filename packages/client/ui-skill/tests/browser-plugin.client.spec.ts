@@ -138,6 +138,13 @@ describe('apply', () => {
           'row.instructions': 'Instructions',
           'menu.userOnly': 'user-only',
         },
+        nl: {
+          'row.running': 'Skill laden',
+          'row.failed': 'Skill laden mislukt',
+          'row.stopped': 'Skill laden gestopt',
+          'row.instructions': 'Instructies',
+          'menu.userOnly': 'alleen gebruiker',
+        },
       },
     }])
   })
