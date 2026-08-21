@@ -1,0 +1,50 @@
+/* Phone overrides for the settings shell (max-width: 560px): the desktop
+   centered 800px two-column panel becomes a full-screen sheet — a column
+   stack with a horizontal tab strip and edge-padding content. Rules exist
+   only inside the media query and are applied together with the base
+   classes (clsx merge in SettingsRoot.tsx), so wider viewports keep the
+   base sheet untouched. */
+
+.panel {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  max-width: none;
+  border-radius: 0;
+  flex-direction: column;
+}
+
+.nav {
+  flex: none;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  padding: 10px 12px 0;
+  overflow-x: auto;
+}
+
+.navTitle {
+  flex: none;
+  padding: 0;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: nowrap;
+}
+
+.navList {
+  flex-direction: row;
+  gap: 4px;
+  min-width: 0;
+}
+
+.navCell {
+  flex: none;
+  height: 32px;
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+.options {
+  padding: 0 16px 16px;
+}

@@ -18,6 +18,7 @@ import {
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { SettingsRootComponentProps, SettingsSectionRow } from './shell-contract.ts'
 import css from './SettingsRoot.module.css'
+import mobile from './SettingsRoot.mobile.module.css'
 
 /** Nav glyph by section id; unknown ids fall back to the settings gear. */
 function navIcon(id: string) {
@@ -61,15 +62,15 @@ function SettingsPanel({ rows, renderSlot, activeId, onSelect, onClose }: PanelP
   return (
     <div className={css.overlay} role="presentation">
       <div className={css.mask} aria-hidden="true" onClick={onClose} />
-      <div className={css.panel} role="dialog" aria-modal="true" aria-labelledby={titleId}>
-        <nav className={css.nav}>
-          <div className={css.navTitle} id={titleId}>{renderSlot('settings.header', {})}</div>
-          <div className={css.navList}>
+      <div className={clsx(css.panel, mobile.panel)} role="dialog" aria-modal="true" aria-labelledby={titleId}>
+        <nav className={clsx(css.nav, mobile.nav)}>
+          <div className={clsx(css.navTitle, mobile.navTitle)} id={titleId}>{renderSlot('settings.header', {})}</div>
+          <div className={clsx(css.navList, mobile.navList)}>
             {rows.map(row => (
               <button
                 key={row.id}
                 type="button"
-                className={clsx(css.navCell, row.id === active && css.active)}
+                className={clsx(css.navCell, mobile.navCell, row.id === active && css.active)}
                 aria-current={row.id === active ? 'true' : undefined}
                 onClick={() => { onSelect(row.id) }}
               >
@@ -87,7 +88,7 @@ function SettingsPanel({ rows, renderSlot, activeId, onSelect, onClose }: PanelP
               <span className={css.hiddenLabel}>{renderSlot('settings.close', {})}</span>
             </button>
           </div>
-          <div className={css.options}>
+          <div className={clsx(css.options, mobile.options)}>
             {active !== undefined && renderSlot('settings.section', { close: onClose }, { only: active })}
           </div>
         </div>

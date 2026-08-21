@@ -22,6 +22,14 @@
   background: var(--dsw-alias-button-floating-hover);
 }
 
+@media (max-width: 560px) {
+  .fab {
+    /* Phone: pin to the right edge and lift clear of the stacked composer. */
+    right: 8px;
+    bottom: 208px;
+  }
+}
+
 .backdrop {
   position: fixed;
   inset: 0;
