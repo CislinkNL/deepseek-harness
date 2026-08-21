@@ -122,8 +122,9 @@ const PRIVILEGED_METHODS = new Set([
  * Mounts the API gateway under the browser transport prefix. Every request on
  * the prefix passes the browser-trust fence first (DNS-rebinding and
  * cross-site defense — [api-request-trust](./api-request-trust.ts));
- * privileged methods additionally pass it with an empty trust list, which
- * pins them to loopback.
+ * privileged methods additionally re-check the fence inside the bridge
+ * handler, so loopback and the deployment's declared trusted authorities
+ * reach them.
  * @param ctx - Host plugin context.
  * @param config - resolved plugin config (schema defaults applied).
  */
