@@ -39,6 +39,10 @@
   overflow: auto;
   border-radius: 12px;
   background: var(--dsw-alias-bg-overlay);
+  /* Elevated surface: the scrollbar thumb takes the l2 elevation tokens
+     (see ui-theme styles/scrollbar.css for the rebinding contract). */
+  --dsh-scrollbar-thumb: var(--dsw-alias-scrollbar-bg-l2);
+  --dsh-scrollbar-thumb-hover: var(--dsw-alias-scrollbar-hover-l2);
   border: 1px solid var(--dsw-alias-border-l);
   padding: 16px;
   display: flex;
