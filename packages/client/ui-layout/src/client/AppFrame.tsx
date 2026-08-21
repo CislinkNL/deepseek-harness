@@ -127,6 +127,30 @@ export function AppFrame({
     }
   }, [])
 
+  // Soft-keyboard bridge: while the on-screen keyboard covers the composer,
+  // browsers that keep the layout viewport full-height (iOS Safari) still
+  // shrink the visual viewport. Mirror the occluded height into a custom
+  // property the frame reclaims (AppFrame.module.css); Android Chrome
+  // instead resizes the layout viewport itself (interactive-widget in
+  // apps/web/index.html), which leaves the inset at zero.
+  useEffect(() => {
+    const visualViewport = window.visualViewport
+    const el = frameRef.current
+    /* v8 ignore next -- the ref is always attached by effect time: the frame div renders unconditionally. */
+    if (visualViewport === null || visualViewport === undefined || el === null) return
+    const apply = () => {
+      const inset = Math.max(0, document.documentElement.clientHeight - visualViewport.height - visualViewport.offsetTop)
+      el.style.setProperty('--dsh-keyboard-inset', `${inset}px`)
+    }
+    apply()
+    visualViewport.addEventListener('resize', apply)
+    visualViewport.addEventListener('scroll', apply)
+    return () => {
+      visualViewport.removeEventListener('resize', apply)
+      visualViewport.removeEventListener('scroll', apply)
+    }
+  }, [])
+
   // Narrow viewports auto-collapse the sidebar; the store mirror keeps
   // toggleSidebar's semantics right (narrow toggles flip the manual
   // re-expand override, stores.ts). Collapsed is decided here, so the

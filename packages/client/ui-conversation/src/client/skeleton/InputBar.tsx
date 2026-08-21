@@ -587,7 +587,16 @@ export function InputBar({
     }
     if (inputActions === undefined) return // absent machine: the button is disabled
     /* v8 ignore next -- defensive: the primary button is disabled while empty||disabled, so a click cannot reach the false arm. */
-    if (!empty && !disabled && !machineBusy) inputActions.submit()
+    if (!empty && !disabled && !machineBusy) {
+      inputActions.submit()
+      // A touch Send tap ends the typing gesture: release focus so the OS
+      // drops the soft keyboard and the reply takes the viewport. Hover
+      // pointers keep focus for continuous typing; minimal embedders without
+      // matchMedia keep focus like hover pointers.
+      const coarse = typeof window.matchMedia === 'function'
+        && window.matchMedia('(hover: none) and (pointer: coarse)').matches
+      if (coarse) inputRef.current?.blur()
+    }
   }
 
   // The Access seat: the projection-fed permission chip (renders nothing

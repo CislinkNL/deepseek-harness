@@ -410,3 +410,24 @@ describe('AppFrame — unmount with an in-flight resize frame', () => {
     expect(tracks(frame)).toEqual([280, 330])
   })
 })
+
+describe('AppFrame — soft-keyboard bridge', () => {
+  it('shrinks the frame by the keyboard-occluded visual viewport height', () => {
+    const vv = Object.assign(new EventTarget(), { height: 400, offsetTop: 0 }) as unknown as VisualViewport
+    vi.stubGlobal('visualViewport', vv)
+    vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(800)
+    const { frame, unmount } = mountFrame()
+    // Layout viewport 800, visible 400: the occluded half is the inset.
+    expect(frame.style.getPropertyValue('--dsh-keyboard-inset')).toBe('400px')
+    act(() => {
+      Object.assign(vv, { height: 800 })
+      vv.dispatchEvent(new Event('resize'))
+    })
+    expect(frame.style.getPropertyValue('--dsh-keyboard-inset')).toBe('0px')
+    unmount()
+    // The listeners left with the frame: a later scroll changes nothing.
+    Object.assign(vv, { height: 300 })
+    act(() => { vv.dispatchEvent(new Event('scroll')) })
+    expect(frame.style.getPropertyValue('--dsh-keyboard-inset')).toBe('0px')
+  })
+})

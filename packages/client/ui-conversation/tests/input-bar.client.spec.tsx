@@ -618,6 +618,33 @@ describe('Enter semantics', () => {
       vi.useRealTimers()
     }
   })
+
+  it('a coarse-pointer Send tap blurs the composer so the OS drops the keyboard', () => {
+    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: true }))
+    try {
+      const { button, textarea, sink } = bench({ draft: '手机发送' })
+      textarea.focus()
+      expect(document.activeElement).toBe(textarea)
+      fireEvent.click(button)
+      expect(sink).toHaveBeenCalledTimes(1)
+      expect(document.activeElement).not.toBe(textarea)
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
+  it('a hover-pointer Send tap keeps focus for continuous typing', () => {
+    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({ matches: false }))
+    try {
+      const { button, textarea, sink } = bench({ draft: '桌面连续输入' })
+      textarea.focus()
+      fireEvent.click(button)
+      expect(sink).toHaveBeenCalledTimes(1)
+      expect(document.activeElement).toBe(textarea)
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
 })
 
 describe('running and lock semantics', () => {
