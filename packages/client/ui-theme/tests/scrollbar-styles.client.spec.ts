@@ -559,11 +559,14 @@ describe('elevated surface rebinds', () => {
     // new palette token on an elevated rung is in scope the moment it is
     // defined. `--dsw-specific-tip` is the regression that proved the point: it
     // resolves to the same dark rung as the menu surface, and the Todo panel
-    // scrolled on it unrebound while a rebind-derived set stayed green.
+    // scrolled on it unrebound while a rebind-derived set stayed green. The
+    // Dogfight palette shares the layer-3 rung with the overlay, while input
+    // wells sit off the ladder (light equals bg-base, dark between base and
+    // layer-2), which keeps input-major out of the set.
     expect(elevatedSurfaces).toContain('--dsw-alias-bg-layer-2')
     expect(elevatedSurfaces).toContain('--dsw-alias-bg-layer-3')
     expect(elevatedSurfaces).toContain('--dsw-specific-menu')
-    expect(elevatedSurfaces).toContain('--dsw-specific-input-major')
+    expect(elevatedSurfaces).toContain('--dsw-alias-bg-overlay')
     expect(elevatedSurfaces).toContain('--dsw-specific-tip')
     // Base surfaces stay out, or every scroll container would be in scope and
     // the check would say nothing.
