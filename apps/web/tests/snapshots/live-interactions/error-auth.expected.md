@@ -20,6 +20,7 @@
   - text: This turn failedAPI key is invalid
   - code: AUTH
 - textbox "Message the agent"
+- button "Attach"
 - button "Commands":
   - img
 - 'button "Access mode, current: Workspace Write"': Workspace Write

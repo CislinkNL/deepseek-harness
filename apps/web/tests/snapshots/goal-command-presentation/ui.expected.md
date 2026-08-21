@@ -15,6 +15,7 @@
   - img
   - text: "goal No goal is currently set. Usage: /goal [<objective>|clear|edit <objective>|pause|resume]"
 - textbox "Message the agent"
+- button "Attach"
 - button "Commands":
   - img
 - 'button "Access mode, current: Workspace Write"': Workspace Write

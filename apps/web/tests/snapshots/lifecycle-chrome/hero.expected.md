@@ -30,6 +30,7 @@
   - text: Standard mode
   - img
 - textbox "Describe what you want to build"
+- button "Attach"
 - button "Commands":
   - img
 - tooltip "Commands"
@@ -41,3 +42,4 @@
 - text: Details
 - button "Close details"
 - text: Click a tool row in the message flow to view its details
+- button "任务看板": 📋

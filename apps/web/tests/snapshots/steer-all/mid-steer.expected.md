@@ -28,6 +28,7 @@
 - button "Copy":
   - img
 - textbox "Message the agent"
+- button "Attach"
 - button "Commands":
   - img
 - 'button "Access mode, current: Workspace Write"': Workspace Write

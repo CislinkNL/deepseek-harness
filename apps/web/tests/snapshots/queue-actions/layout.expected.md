@@ -36,6 +36,7 @@
   - img
 - button "2 queued messages"
 - textbox "Cmd/Ctrl+Enter steers all queued messages"
+- button "Attach"
 - button "Commands":
   - img
 - 'button "Access mode, current: Workspace Write"': Workspace Write
